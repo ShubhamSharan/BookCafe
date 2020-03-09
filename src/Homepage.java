@@ -20,6 +20,7 @@ public class Homepage {
     }
     public static void NewUserView(){
 
+
     }
 
     public static void PublisherView(){
