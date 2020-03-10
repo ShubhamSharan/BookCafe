@@ -32,10 +32,10 @@ public class Homepage {
     public static void main(String [] args){
         System.out.println("\u001b[35mWELCOME TO THE BOOK CAFE \uD83D\uDCDA \uD83E\uDD13");
         System.out.println("\u001b[34m------------- Menu -------------");
-        System.out.println("\uD83D\uDC69\u200D\uD83D\uDCBC♂️ Book Cafe Administrator press 1 ");
-        System.out.println("\uD83E\uDDB8\u200D♂️ Existing User (Sign in) press 2");
-        System.out.println("\uD83D\uDD75️\u200D♂️ New User (Sign up) press 3");
-        System.out.println("\uD83D\uDC81\u200D♂️ Publisher press 3");
+        System.out.println("\uD83D\uDC69\u200D Book Cafe Administrator press 1 ");
+        System.out.println("\uD83E\uDDB8\u200D️ Existing User (Sign in) press 2");
+        System.out.println("\uD83D\uDD75️\u200D️ New User (Sign up) press 3");
+        System.out.println("\uD83D\uDC81\u200D️ Publisher press 3");
 
         Scanner usrin = new Scanner(System.in);
         boolean flag = true;
@@ -51,6 +51,8 @@ public class Homepage {
                 case 4: PublisherView(); flag = false; break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
+            User temp = new User();
+            System.out.println(temp.UserIDGen());
         }
 
 

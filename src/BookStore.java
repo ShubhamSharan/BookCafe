@@ -12,8 +12,10 @@ public class BookStore {
     String publisher_id;
     int number_of_pages;
     double unit_price;
-    private double percentage_to_publisher;
     Date date_of_publish;
+
+    private double percentage_to_publisher;
+
 
     public BookStore(String isbn, int quant, String bname, ArrayList<Author> auths, ArrayList<Genre> gns, String pid, int pages, double price, double perpub, Date dateop){
         ISBN = isbn;
