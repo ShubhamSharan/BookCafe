@@ -1,16 +1,19 @@
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Scanner;
 
 public class BookStore {
     String book_store_name;
     HashMap<String,Book> books;
+    HashMap<Integer,String> search_types;
     Scanner usrinput = new Scanner(System.in);
 
     public BookStore(String bsn){
         book_store_name = bsn;
         books = new HashMap();
+        search_types.put(1,"ISBN");
+        search_types.put(2,"book_name");
+        search_types.put(3,"authors");
+        search_types.put(4,"genre");
     }
     //Adding Books to a BookStore via SQL
     public void addBookToStore(Book book){
@@ -31,27 +34,17 @@ public class BookStore {
     public void addToCart(){
         System.out.println("Enter 10 digit ISBN number to add to Cart: ");
         String isbn = usrinput.nextLine();
-        if(isbn.length()==10){
+        if(isbn.length()!=10){
             System.out.println("Invalid ISBN number");
+        }else{
+
         }
 
     }
-    public void IsbnSearch(){
-        System.out.println("Enter 10 digit ISBN number: ");
-        String isbn = usrinput.nextLine();
+    public void search(int option){
+
     }
-    public void BookNameSearch(){
-        System.out.println("Enter Book Name: ");
-        String book_name = usrinput.nextLine();
-    }
-    public void AuthorNameSearch(){
-        System.out.println("Enter Author Full Name: ");
-        String author_name = usrinput.nextLine();
-    }
-    public void GenreSearch(){
-        System.out.println("Enter Genre Name: ");
-        String genre = usrinput.nextLine();
-    }
+
     //SearchTool
     public void searchTool(){
         Book selectedBook = null;
@@ -66,13 +59,10 @@ public class BookStore {
             System.out.print("\u001b[33mInsert a Single Number and Press enter/ return :");
             int option = usrin.nextInt();
             System.out.println("You have entered " + option);
-            switch(option){
-                case 1: IsbnSearch();flag = false; break;
-                case 2: BookNameSearch();flag = false; break;
-                case 3: AuthorNameSearch();flag = false; break;
-                case 4: GenreSearch(); flag = false; break;
-                default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
-            }
+            if(search_types.get(option)!=null){
+                search(option);
+            }else{System.out.println("You have selected an invalid option!");}
+
         }
     }
 
