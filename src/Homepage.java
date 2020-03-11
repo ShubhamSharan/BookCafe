@@ -2,7 +2,7 @@ import java.awt.print.Book;
 import java.util.Scanner;
 
 public class Homepage {
-    //BookStore bookcafe = new BookStore();
+    BookStore bookcafe = new BookStore("bookcafe");
 
     public static void AdministratorView(){
         System.out.println("\u001b[34m------------- Menu -------------");

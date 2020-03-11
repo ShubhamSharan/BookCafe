@@ -7,5 +7,6 @@ public class Author {
         first_name = fname;
         second_name = sname;
     }
+
 }
 

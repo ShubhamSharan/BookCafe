@@ -41,4 +41,11 @@ public class Book {
         percentage_to_publisher = perpub;
         date_of_publish = dateop;
     }
+    public String printAuthors(){
+        return null;
+
+    }
+    public String printGenres(){
+        return null;
+    }
 }
