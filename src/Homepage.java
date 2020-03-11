@@ -1,9 +1,9 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.awt.print.Book;
 import java.util.Scanner;
 
 public class Homepage {
+    //BookStore bookcafe = new BookStore();
+
     public static void AdministratorView(){
         System.out.println("\u001b[34m------------- Menu -------------");
         System.out.println("\uD83D\uDCD6 Search for a book press 1");
