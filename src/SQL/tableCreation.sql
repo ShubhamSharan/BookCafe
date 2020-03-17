@@ -1,14 +1,24 @@
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
 
 CREATE TYPE bankaccounttype AS (
     account_number  numeric(16,0),
-    account_name    text,
-    expirydetails   date,
+    account_name    varchar(255),
+    expirydetails   date
+);
+
+CREATE TYPE addresstype AS
+(
+    address_name varchar(255),
+    city varchar(255),
+    state varchar(4),
+    zip varchar(15)
 );
 
 CREATE TYPE nametype AS (
-    first_name  varchar(255) not null,
+    first_name  varchar(255),
     middle_name   varchar(255),
-    last_name  varchar(255) not null,
+    last_name  varchar(255)
 );
 
 CREATE TABLE public.author
@@ -56,4 +66,28 @@ CREATE TABLE public.shipment
     shipment_recieved_date date,
     primary key (shipment_id),
     foreign key (isbn) references bookstore
+);
+
+CREATE TABLE public.publisher
+(
+    publisher_id varchar(10) not null,
+    name nametype,
+    email varchar(255) not null,
+    password varchar(255) not null,
+    address addressType not null,
+    phone_number varchar(16)[4],
+    banking_account bankaccounttype not null,
+    primary key (publisher_id)
+);
+
+CREATE TABLE public.user
+(
+    publisher_id varchar(10) not null,
+    name nametype,
+    email varchar(255) not null,
+    password varchar(255) not null,
+    address addressType not null,
+    phone_number varchar(16)[4],
+    banking_account bankaccounttype not null,
+    primary key (publisher_id)
 );

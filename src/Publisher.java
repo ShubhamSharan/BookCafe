@@ -27,4 +27,15 @@ public class Publisher {
         Date date_of_birth = dob;
         BankingAccount account = acc;
     }
+    public Publisher(){
+        String user_id = "";
+        String first_name = "";
+        String second_name = "";
+        String email = "";
+        String password = "";
+        Address address = new Address();
+        PhoneNumber phonenumber = new PhoneNumber();
+        Date date_of_birth = null;
+        BankingAccount account = new BankingAccount();
+    }
 }

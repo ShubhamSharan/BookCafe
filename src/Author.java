@@ -7,6 +7,11 @@ public class Author {
         first_name = fname;
         second_name = sname;
     }
+    public Author(){
+        author_id = "";
+        first_name = "";
+        second_name = "";
+    }
 
 }
 

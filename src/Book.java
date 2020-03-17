@@ -13,7 +13,7 @@ public class Book {
     int number_of_pages;
     double unit_price;
     Date date_of_publish;
-    private double percentage_to_publisher;
+    double percentage_to_publisher;
 
     public Book(){
         ISBN = "";
