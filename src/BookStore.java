@@ -1,15 +1,15 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class BookStore implements StoreInterface {
     String book_store_name;
+    // Trackers
     HashMap<String,Book> books;
     HashMap<String,Publisher> publishers;
     HashMap<String,Author> authors;
+    HashMap<String, Shipment> shipments;
+
     HashMap<Integer,String> search_types;
     Scanner usrinput = new Scanner(System.in);
     boolean dbempty;
@@ -27,9 +27,9 @@ public class BookStore implements StoreInterface {
     //Data in DB
     public BookStore(String bsn){
         book_store_name = bsn;
-        books = addBooks();
-        publishers = addPubslishers();
-        authors = addAuthors();
+        addBooks();
+        addPubslishers();
+        addAuthors();
         dbempty = false;
         addSearchTypes();
     }
@@ -41,8 +41,7 @@ public class BookStore implements StoreInterface {
         this.search_types.put(4,"genre");
     }
 
-    public HashMap<String, Book> addBooks(){
-        HashMap<String, Book> bookstore = null;
+    public void addBooks(){
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe","shubhamsharan09","");
                 Statement statement = connection.createStatement();
@@ -62,7 +61,8 @@ public class BookStore implements StoreInterface {
                 book.percentage_to_publisher = resultSet.getDouble("percent_to_publisher");
                 book.date_of_publish = resultSet.getDate("date_of_publish");
 
-                bookstore.put(book.ISBN, book);
+                //In this Instance
+                this.books.put(book.ISBN, book);
             }
 
             //Checks if all authors exist in the database
@@ -73,7 +73,6 @@ public class BookStore implements StoreInterface {
         } catch (Exception sqle) {
             System.out.println("Exception: " + sqle);
         }
-        return null;
     }
 
     @Override
@@ -99,8 +98,7 @@ public class BookStore implements StoreInterface {
     }
 
     @Override
-    public HashMap<String, Author> addAuthors() {
-        HashMap<String, Author> authStore = null;
+    public void addAuthors() {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe");
                 Statement statement = connection.createStatement();
@@ -113,17 +111,23 @@ public class BookStore implements StoreInterface {
                 //author.first_name = aSet.getString();
                 //author.second_name = aSet.getString();
             }
-
-
         } catch (Exception sqle) {
             System.out.println("Exception: " + sqle);
         }
-        return authStore;
     }
 
     @Override
-    public HashMap<String, Publisher> addPubslishers() {
-        HashMap<String, Publisher> pubSet = null;
+    public void addShipments() {
+
+    }
+
+    @Override
+    public void addUsers() {
+
+    }
+
+    @Override
+    public void addPubslishers() {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe");
                 Statement statement = connection.createStatement();
@@ -132,17 +136,18 @@ public class BookStore implements StoreInterface {
             while(aSet.next()){
                 Publisher publisher = new Publisher();
                 publisher.user_id = aSet.getString("author_id");
-                //Custom name type
-                //author.first_name = aSet.getString();
-                //author.second_name = aSet.getString();
+                //TODO: Custom name type
+                publisher.first_name = aSet.getString("(name).first_name");
+                publisher.second_name = aSet.getString("(name).second_name");
+
+                publisher.email = aSet.getString("email");
+                publisher.setPassword(aSet.getString("password"));
+                publisher.setPhonenumber((String[]) aSet.getArray("phone_number").getArray());
             }
-
-
         } catch (Exception sqle) {
             System.out.println("Exception: " + sqle);
         }
 
-        return pubSet;
     }
 
     //Adding Books to a BookStore via SQL
