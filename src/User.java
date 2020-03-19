@@ -66,7 +66,6 @@ public class User {
         date_of_birth = dob;
         account = acc;
         shoppingcarts = sc;
-
     }
 
     public void setAccount(BankingAccount account) {

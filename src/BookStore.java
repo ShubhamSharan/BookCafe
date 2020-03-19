@@ -190,17 +190,22 @@ public class BookStore implements StoreInterface {
         System.out.println("\uD83D\uDCD6 Search for a book press 1");
         System.out.println("\uD83D\uDCD6 Add a book press 2");
         System.out.println("\uD83D\uDCD6 Delete a book press 3");
-        System.out.println("\uD83D\uDCD6 Search for a book press 3");
+        System.out.println("\uD83D\uDCD6 Search for a book press 4");
     }
-    public void PublisherView(){
+    public void ExPublisherView(){
         System.out.println("\u001b[34m------------- Menu -------------");
-        System.out.println("\uD83D\uDCD6 Search for a book press 1 ");
+        System.out.println("\uD83D\uDCD6 Search your books press 1 ");
         System.out.println("\uD83D\uDCD6 Check Sales Account Status press 2");
         System.out.println("\uD83D\uDCD6 Check profile details 3");
     }
 
-
-
+    public void NewPublisherView(){
+        try{
+            Publisher.NewUsr(this.iDGen());
+        }catch(IOException | ParseException ex){
+            System.out.println("ERROR Creating New Publisher");
+        }
+    }
 
     public void search(int option){
 
@@ -216,14 +221,27 @@ public class BookStore implements StoreInterface {
         System.out.println("\uD83D\uDCD6 Genre - press 4");
         Scanner usrin = new Scanner(System.in);
         boolean flag = true;
+        int option;
         while (flag){
             System.out.print("\u001b[33mInsert a Single Number and Press enter/ return :");
-            int option = usrin.nextInt();
+            option = usrin.nextInt();
             System.out.println("You have entered " + option);
             if(search_types.get(option)!=null){
                 search(option);
             }else{System.out.println("You have selected an invalid option!");}
+        }
 
+
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe");
+                Statement statement = connection.createStatement();
+        ) {
+            ResultSet aSet = statement.executeQuery("select * from author where ");
+            while(aSet.next()){
+
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception: " + sqle);
         }
     }
 
