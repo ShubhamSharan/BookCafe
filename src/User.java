@@ -1,16 +1,25 @@
 import helperclasses.Address;
 import helperclasses.BankingAccount;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Random;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static helperclasses.Address.makeAddress;
+import static helperclasses.BankingAccount.makeAccount;
+import static helperclasses.inputFunctions.*;
 
 public class User {
     String user_id;
     String first_name;
+    String middle_name;
     String second_name;
     Date date_of_birth;
     HashSet<Integer> uids = new HashSet<>();
+    ArrayList<ShoppingCart> shoppingcarts;
 
     private String email;
     private String password;
@@ -18,28 +27,46 @@ public class User {
     private String[] phonenumber;
     private BankingAccount account;
 
+    public User(String id){
+        user_id = id;
+        first_name = "";
+        middle_name = "";
+        second_name = "";
+        email = "";
+        password = "";
+        address = null;
+        phonenumber = null;
+        date_of_birth = new Date();
+        account = new BankingAccount();
+        shoppingcarts = new ArrayList<>();
+    }
     public User(){
-        String user_id = "0";
-        String first_name = "";
-        String second_name = "";
-        String email = "";
-        String password = "";
-        Address address = new Address();
-        String[] phonenumber = null;
-        Date date_of_birth = new Date();
-        BankingAccount account = new BankingAccount();
+        user_id = "";
+        first_name = "";
+        middle_name = "";
+        second_name = "";
+        email = "";
+        password = "";
+        address = null;
+        phonenumber = null;
+        date_of_birth = new Date();
+        account = new BankingAccount();
+        shoppingcarts = new ArrayList<>();
+
     }
 
-    public User(String userId, String fname, String sname, String eml, String pass, Address adrs, String[] pnumber, Date dob, BankingAccount acc){
-        String user_id = userId;
-        String first_name = fname;
-        String second_name = sname;
-        String email = eml;
-        String password = pass;
-        Address address = adrs;
-        String[] phonenumber = pnumber;
-        Date date_of_birth = dob;
-        BankingAccount account = acc;
+    public User(String userId, String fname, String sname, String eml, String pass, Address adrs, String[] pnumber, Date dob, BankingAccount acc, ArrayList<ShoppingCart> sc){
+        user_id = userId;
+        first_name = fname;
+        second_name = sname;
+        email = eml;
+        password = pass;
+        address = adrs;
+        phonenumber = pnumber;
+        date_of_birth = dob;
+        account = acc;
+        shoppingcarts = sc;
+
     }
 
     public void setAccount(BankingAccount account) {
@@ -58,23 +85,22 @@ public class User {
         this.phonenumber = phonenumber;
     }
 
-    public String UserIDGen(){
-        int selected;
-        while(true){
-            Random rand = new Random();
-            selected = 1000000000+ rand.nextInt(100000000);
-            if(!uids.contains(selected)){
-                uids.add(selected);
-                return String.valueOf(selected);
-            }
-        }
-    }
 
-    public User addUser(){
-        User newuser = null;
-
-
-        return newuser;
+    public static User NewUsr(String id) throws IOException, ParseException {
+        System.out.println("\u001b[34m------------- Welcome to the BookCafe -------------");
+        User newUser = new User(id);
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        newUser.first_name = getInput(br, "First Name: ");
+        System.out.print("Middle Name (Optional): ");
+        newUser.middle_name = br.readLine();
+        newUser.second_name = getInput(br, "Last Name : ");
+        newUser.email = getInput(br,"Email : " );
+        newUser.password = getInput(br, "Password : ");
+        newUser.address = makeAddress();
+        newUser.phonenumber = enterPhoneNumber(br);
+        newUser.date_of_birth = new SimpleDateFormat("dd/MM/yyyy").parse(getInput(br, "Date of Birth : "));
+        newUser.setAccount(makeAccount());
+        return newUser;
     }
 
 }

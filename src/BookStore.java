@@ -1,27 +1,32 @@
+import java.io.IOException;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Random;
 import java.util.Scanner;
 
 public class BookStore implements StoreInterface {
     String book_store_name;
     // Trackers
-    HashMap<String,Book> books;
-    HashMap<String,Publisher> publishers;
-    HashMap<String,Author> authors;
-    HashMap<String, Shipment> shipments;
+    HashSet<Integer> uids = new HashSet<>();
+    HashMap<String,Book> books = new HashMap<>();
+    HashMap<String,Publisher> publishers= new HashMap<>();
+    HashMap<String,Author> authors= new HashMap<>();
+    HashMap<String, Shipment> shipments= new HashMap<>();
 
-    HashMap<Integer,String> search_types;
-    Scanner usrinput = new Scanner(System.in);
+    HashMap<Integer,String> search_types = new HashMap<>();
     boolean dbempty;
 
     //No Data iun DB
     public BookStore(String bsn, boolean db){
         book_store_name = bsn;
-        books = null;
-        publishers = null;
-        authors = null;
+        books = new HashMap<>();
+        publishers = new HashMap<>();
+        authors = new HashMap<>();
+        shipments = new HashMap<>();
         dbempty = true;
-        addSearchTypes();
+        this.addSearchTypes();
     }
 
     //Data in DB
@@ -35,10 +40,22 @@ public class BookStore implements StoreInterface {
     }
 
     public void addSearchTypes(){
-        this.search_types.put(1,"ISBN");
-        this.search_types.put(2,"book_name");
-        this.search_types.put(3,"authors");
-        this.search_types.put(4,"genre");
+        search_types.put(1,"ISBN");
+        search_types.put(2,"book_name");
+        search_types.put(3,"authors");
+        search_types.put(4,"genre");
+    }
+
+    public String iDGen(){
+        int selected;
+        while(true){
+            Random rand = new Random();
+            selected = 1000000000+ rand.nextInt(100000000);
+            if(!uids.contains(selected)){
+                uids.add(selected);
+                return String.valueOf(selected);
+            }
+        }
     }
 
     public void addBooks(){
@@ -83,18 +100,13 @@ public class BookStore implements StoreInterface {
         ) {
             //Checks if Publisher exist already
             ResultSet pubSet = statement.executeQuery("select publisher_id from publisher where publisher_id = '"+book.publisher_id+"'");
-
             //Checks if all authors exist in the database
             ResultSet authSet = statement.executeQuery("");
             //Adds Book to database
             ResultSet InsertSet = statement.executeQuery("insert into bookstore values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.publisher_id+","+book.number_of_pages+","+book.unit_price+","+book.percentage_to_publisher+")");
-
-
-
         } catch (Exception sqle) {
             System.out.println("Exception: " + sqle);
         }
-
     }
 
     @Override
@@ -135,12 +147,13 @@ public class BookStore implements StoreInterface {
             ResultSet aSet = statement.executeQuery("select * from author");
             while(aSet.next()){
                 Publisher publisher = new Publisher();
-                publisher.user_id = aSet.getString("author_id");
+                publisher.publisher_id = aSet.getString("author_id");
                 //TODO: Custom name type
                 publisher.first_name = aSet.getString("(name).first_name");
+                publisher.middle_name = aSet.getString("(name).middle_name");
                 publisher.second_name = aSet.getString("(name).second_name");
 
-                publisher.email = aSet.getString("email");
+                publisher.setEmail(aSet.getString("email"));
                 publisher.setPassword(aSet.getString("password"));
                 publisher.setPhonenumber((String[]) aSet.getArray("phone_number").getArray());
             }
@@ -156,28 +169,38 @@ public class BookStore implements StoreInterface {
     public void removeBook(String isbn) {
 
     }
-
-    //Book Printing
-    public void printBookDetails(Book book){
-        System.out.println("Book name       : "+ book.book_name);
-        System.out.println("ISBN            : "+ book.ISBN);
-        System.out.println("Authors         : "+ book.printAuthors());
-        System.out.println("Genres          : "+ book.printGenres());
-        System.out.println("Price           : "+ book.unit_price);
-        System.out.println("Number of Pages : "+ book.number_of_pages);
-        System.out.println("Date of publish : "+ book.date_of_publish);
+    //Non static methods
+    public void ExUserView(){
+        System.out.println("\u001b[34m------------- Menu -------------");
+        System.out.println("\uD83D\uDCD6 Search for a book press 1 ");
+        System.out.println("\uD83D\uDCD6 Check your orders 2");
+        System.out.println("\uD83D\uDCD6 Check profile details 3");
     }
-    //
-    public void addToCart(){
-        System.out.println("Enter 10 digit ISBN number to add to Cart: ");
-        String isbn = usrinput.nextLine();
-        if(isbn.length()!=10){
-            System.out.println("Invalid ISBN number");
-        }else{
 
+    public void NewUserView() {
+        try{
+            User.NewUsr(this.iDGen());
+        }catch(IOException | ParseException ex){
+            System.out.println("ERROR Creating New User");
         }
-
     }
+
+    public void AdministratorView(){
+        System.out.println("\u001b[34m------------- Menu -------------");
+        System.out.println("\uD83D\uDCD6 Search for a book press 1");
+        System.out.println("\uD83D\uDCD6 Add a book press 2");
+        System.out.println("\uD83D\uDCD6 Delete a book press 3");
+        System.out.println("\uD83D\uDCD6 Search for a book press 3");
+    }
+    public void PublisherView(){
+        System.out.println("\u001b[34m------------- Menu -------------");
+        System.out.println("\uD83D\uDCD6 Search for a book press 1 ");
+        System.out.println("\uD83D\uDCD6 Check Sales Account Status press 2");
+        System.out.println("\uD83D\uDCD6 Check profile details 3");
+    }
+
+
+
 
     public void search(int option){
 

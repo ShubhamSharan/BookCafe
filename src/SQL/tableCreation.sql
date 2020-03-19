@@ -45,9 +45,9 @@ CREATE TABLE public.bookstore
 
 CREATE TABLE public.shopping_cart
 (
-    order_id varchar(10) not null,
     user_id varchar(10) not null,
-    isbn varchar(10) not null,
+    order_id varchar(10) not null,
+    isbn varchar(10),
     quantity integer,
     status_of_purchase varchar(20),
     primary key (order_id),

@@ -45,6 +45,16 @@ public class Book {
         return null;
 
     }
+    //Book Printing
+    public void printBookDetails(){
+        System.out.println("Book name       : "+ this.book_name);
+        System.out.println("ISBN            : "+ this.ISBN);
+        System.out.println("Authors         : "+ this.printAuthors());
+        System.out.println("Genres          : "+ this.printGenres());
+        System.out.println("Price           : "+ this.unit_price);
+        System.out.println("Number of Pages : "+ this.number_of_pages);
+        System.out.println("Date of publish : "+ this.date_of_publish);
+    }
     public String printGenres(){
         return null;
     }
