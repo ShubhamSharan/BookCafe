@@ -8,7 +8,8 @@ import java.util.Scanner;
 
 import static helperclasses.inputFunctions.addIDs;
 
-public class BookStore implements StoreInterface {
+//This is the ADMIN
+public class BookStore {
     String book_store_name;
     // Trackers
     HashSet<String> uids;
@@ -19,14 +20,14 @@ public class BookStore implements StoreInterface {
         book_store_name = bsn;
         uids = new HashSet<>();
         this.addSearchTypes();
-        uids = addIDs(uids,"user","user_id");
-        uids = addIDs(uids,"publisher","publisher_id");
+        addIDs(uids, "public.user", "user_id");
+        addIDs(uids,"public.publisher","publisher_id");
 
 
     }
 
     public void addSearchTypes(){
-        search_types.put(1,"ISBN");
+        search_types.put(1,"isbn");
         search_types.put(2,"book_name");
         search_types.put(3,"authors");
         search_types.put(4,"genre");
@@ -45,37 +46,40 @@ public class BookStore implements StoreInterface {
     }
 
 
-    @Override
     public void addNewBook(Book book) {
         try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe","shubhamsharan09","yvan2002");
-                Statement statement = connection.createStatement();
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
         ) {
-            //Checks if Publisher exist already
-            ResultSet pubSet = statement.executeQuery("select publisher_id from publisher where publisher_id = '"+book.publisher_id+"'");
-            //Checks if all authors exist in the database
-            ResultSet authSet = statement.executeQuery("");
-            //Adds Book to database
-            ResultSet InsertSet = statement.executeQuery("insert into bookstore values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.publisher_id+","+book.number_of_pages+","+book.unit_price+","+book.percentage_to_publisher+")");
+            ResultSet InsertSet = statement.executeQuery("insert into public.bookstore values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.publisher_id+","+book.number_of_pages+","+book.unit_price+","+book.percentage_to_publisher+")");
+            InsertSet.close();statement.close();connection.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception: " + sqle);
+        }
+    }
+
+    public void addNewBook() throws IOException, ParseException {
+        Book book = new Book();
+        book.createBook();
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            ResultSet InsertSet = statement.executeQuery("insert into public.bookstore values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.publisher_id+","+book.number_of_pages+","+book.unit_price+","+book.percentage_to_publisher+")");
+            statement.close();connection.close();
         } catch (Exception sqle) {
             System.out.println("Exception: " + sqle);
         }
     }
     //Adding Books to a BookStore via SQL
 
-    @Override
     public void removeBook(String isbn) {
 
     }
     //Non static methods
-    public void ExUserView(){
-        System.out.println("\u001b[34m------------- Menu -------------");
-        System.out.println("\uD83D\uDCD6 Search for a book press 1 ");
-        System.out.println("\uD83D\uDCD6 Check your orders 2");
-        System.out.println("\uD83D\uDCD6 Check profile details 3");
-    }
 
-    public void NewUserView() {
+
+    public void NewUser() {
         try{
             User.NewUsr(this.iDGen());
         }catch(IOException | ParseException ex){
@@ -83,21 +87,8 @@ public class BookStore implements StoreInterface {
         }
     }
 
-    public void AdministratorView(){
-        System.out.println("\u001b[34m------------- Menu -------------");
-        System.out.println("\uD83D\uDCD6 Search for a book press 1");
-        System.out.println("\uD83D\uDCD6 Add a book press 2");
-        System.out.println("\uD83D\uDCD6 Delete a book press 3");
-        System.out.println("\uD83D\uDCD6 Search for a book press 4");
-    }
-    public void ExPublisherView(){
-        System.out.println("\u001b[34m------------- Menu -------------");
-        System.out.println("\uD83D\uDCD6 Search your books press 1 ");
-        System.out.println("\uD83D\uDCD6 Check Sales Account Status press 2");
-        System.out.println("\uD83D\uDCD6 Check profile details 3");
-    }
 
-    public void NewPublisherView(){
+    public void NewPublisher(){
         try{
             Publisher.NewUsr(this.iDGen());
         }catch(IOException | ParseException ex){
@@ -106,14 +97,16 @@ public class BookStore implements StoreInterface {
     }
 
     public void search(int option){
+
         try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe");
-                Statement statement = connection.createStatement();
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
         ) {
             ResultSet aSet = statement.executeQuery("select * from author");
             while(aSet.next()){
 
             }
+            statement.close();connection.close();
         } catch (Exception sqle) {
             System.out.println("Exception: " + sqle);
         }

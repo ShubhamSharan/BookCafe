@@ -50,8 +50,8 @@ public class inputFunctions {
 
     public static HashSet<String> addIDs(HashSet<String> uids, String tablename, String columnname){
         try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe","shubhamsharan09","");
-                Statement statement = connection.createStatement();
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","");
+                Statement statement = connection.createStatement()
         ) {
             ResultSet aSet = statement.executeQuery("select "+columnname+" from "+tablename);
             while(aSet.next()){

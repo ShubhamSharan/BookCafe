@@ -45,16 +45,13 @@ CREATE TABLE public.author
  primary key (author_id)
 );
 
-
-
-
 CREATE TABLE public.bookstore
 (
     isbn varchar(10) not null,
     quantity integer not null default 0,
     book_name varchar(255) not null,
-    -- TODO: author_id
-    -- TODO: genre
+    author_id varchar(10)[20],
+    genre varchar(100)[20],
     publisher_id varchar(10) not null,
     number_of_pages integer not null,
     unit_price numeric(4,2) not null,

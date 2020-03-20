@@ -30,14 +30,14 @@ public class Book {
         ISBN = "";
         quantity = 0;
         book_name = "";
-        authors = new ArrayList<String>();
-        genre = new ArrayList<String>();
+        authors = new ArrayList<>();
+        genre = new ArrayList<>();
         publisher_id = "";
         number_of_pages = 0;
         unit_price = 0.0;
         percentage_to_publisher = 0.0;
         date_of_publish = new Date();
-        uids = addIDs(uids,"bookstore","isbn");
+        addIDs(uids, "public.bookstore", "isbn");
     }
 
 
@@ -52,7 +52,7 @@ public class Book {
         unit_price = price;
         percentage_to_publisher = perpub;
         date_of_publish = dateop;
-        uids = addIDs(uids,"bookstore","isbn");
+        addIDs(uids, "public.bookstore", "isbn");
     }
 
     public String iDGen(){
@@ -87,13 +87,16 @@ public class Book {
 
     public boolean foundItem(String id, String columnname, String tablename){
         try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe","shubhamsharan09","");
-                Statement statement = connection.createStatement();
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
         ) {
-            ResultSet set = statement.executeQuery("select "+columnname+" from "+tablename+" where "+columnname+" = '"+id+"'");
+            ResultSet set = statement.executeQuery("select "+columnname+" from public."+tablename+" where "+columnname+" = '"+id+"'");
             if (set.next() == false) {
-                System.out.println("No such"+id+"exisits in "+tablename); return false;
+                System.out.println("No such"+id+"exisits in "+tablename);
+                statement.close();connection.close();
+                return false;
             }else{
+                statement.close();connection.close();
                 return true;
             }
         } catch (Exception sqle) {

@@ -1,5 +1,7 @@
 import java.util.Scanner;
 
+import static helperclasses.menus.*;
+
 public class Homepage {
     public static void menu(){
         System.out.println("\u001b[34m------------- Menu -------------");
@@ -21,11 +23,11 @@ public class Homepage {
             int option = usrin.nextInt();
             System.out.println("You have entered " + option);
             switch(option){
-                case 1: bookcafe.AdministratorView();System.out.println("\uD83D\uDC4B Goodbye Admin");break;
-                case 2: bookcafe.ExUserView();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 3: bookcafe.NewUserView();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 4: bookcafe.ExPublisherView();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 5: bookcafe.NewPublisherView();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 1: AdministratorView();System.out.println("\uD83D\uDC4B Goodbye Admin");break;
+                case 2: ExUserView();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 3: bookcafe.NewUser();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 4: ExPublisherView();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 5: bookcafe.NewPublisher();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 6: flag = false; System.out.println("\uD83D\uDC4B Thank you for visiting"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
