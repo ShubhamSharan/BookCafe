@@ -1,8 +1,3 @@
-import java.awt.print.Book;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.ParseException;
 import java.util.Scanner;
 
 public class Homepage {
@@ -13,11 +8,11 @@ public class Homepage {
         System.out.println("\uD83D\uDD75️\u200D️ New User (Sign up) press 3");
         System.out.println("\uD83D\uDC81\u200D️ Existing Publisher press 4");
         System.out.println("\uD83E\uDD37\u200D️ New Publisher press 5");
-        System.out.println("\uD83D\uDC4B EXIT BOOKCAFE press 6");
+        System.out.println("\uD83D\uDC4B EXIT BOOKCAFE press 6 \n");
     }
     public static void main(String [] args){
         System.out.println("\u001b[35mWELCOME TO THE BOOK CAFE \uD83D\uDCDA \uD83E\uDD13");
-        BookStore bookcafe = new BookStore("bookcafe", true); //right now the db is empty
+        BookStore bookcafe = new BookStore("bookcafe"); //right now the db is empty
         Scanner usrin = new Scanner(System.in);
         boolean flag = true;
         while (flag){
@@ -28,9 +23,9 @@ public class Homepage {
             switch(option){
                 case 1: bookcafe.AdministratorView();System.out.println("\uD83D\uDC4B Goodbye Admin");break;
                 case 2: bookcafe.ExUserView();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 3: bookcafe.NewUserView();System.out.println("\uD83D\uDCDA Thanks for Signing in");break;
+                case 3: bookcafe.NewUserView();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 4: bookcafe.ExPublisherView();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 5: bookcafe.NewPublisherView();System.out.println("\uD83D\uDCDA Thanks for Signing in");break;
+                case 5: bookcafe.NewPublisherView();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 6: flag = false; System.out.println("\uD83D\uDC4B Thank you for visiting"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }

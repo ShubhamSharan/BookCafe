@@ -21,6 +21,21 @@ public class User {
     HashSet<Integer> uids = new HashSet<>();
     ArrayList<ShoppingCart> shoppingcarts;
 
+    public String iDGen(){
+        int selected;
+        while(true){
+            Random rand = new Random();
+            selected = 1000000000+ rand.nextInt(100000000);
+            if(!uids.contains(selected)){
+                uids.add(selected);
+                return String.valueOf(selected);
+            }
+        }
+    }
+    public void addIDs(){
+
+    }
+
     private String email;
     private String password;
     private Address address;

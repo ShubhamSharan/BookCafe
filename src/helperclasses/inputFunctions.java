@@ -3,6 +3,10 @@ package helperclasses;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +30,38 @@ public class inputFunctions {
 
         }
         return temp;
+    }
+
+    public static String getIDinput(BufferedReader r, String x) throws IOException {
+        System.out.print("* "+x);
+        String temp = r.readLine();
+        while(true){
+            if((temp != null)&&(temp.replaceAll("\\s+","").length()==10)){
+                System.out.println("value:{"+temp+"}"+temp.length());
+                break;
+            }else{
+                System.out.println("Your "+x+"Shouldn't be less than 10 charectors!");
+                System.out.print(x);
+                temp = r.readLine();
+            }
+        }
+        return temp;
+    }
+
+    public static HashSet<String> addIDs(HashSet<String> uids, String tablename, String columnname){
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe","shubhamsharan09","");
+                Statement statement = connection.createStatement();
+        ) {
+            ResultSet aSet = statement.executeQuery("select "+columnname+" from "+tablename);
+            while(aSet.next()){
+                uids.add(aSet.getString("isbn"));
+            }
+
+        } catch (Exception sqle) {
+            System.out.println("Exception: " + sqle);
+        }
+        return uids;
     }
 
 
