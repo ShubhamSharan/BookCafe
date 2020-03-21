@@ -74,6 +74,23 @@ public class BookStore {
     //Adding Books to a BookStore via SQL
 
     public void removeBook(String isbn) {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            ResultSet bookDeleted = statement.executeQuery("select isbn from public.bookstore where isbn ="+isbn);
+            if(!bookDeleted.next()){
+                System.out.println(isbn+" doesn't exist in the database");
+                return;
+            }else{
+                bookDeleted.close();
+                PreparedStatement rem = connection.prepareStatement("delete from public.bookstore where isbn ="+isbn);
+                rem.executeUpdate();
+            }
+            statement.close();connection.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception: " + sqle);
+        }
 
     }
     //Non static methods
