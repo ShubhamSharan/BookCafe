@@ -1,16 +1,15 @@
 package helperclasses;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static helperclasses.inputFunctions.getInput;
 
 public class Address {
-    String address_name;
-    String city;
-    String state;
-    String zip;
+    public String address_name;
+    public String city;
+    public String state;
+    public String zip;
 
     public Address(String an, String ct, String st, String zp){
         address_name = an;
@@ -18,7 +17,8 @@ public class Address {
         state = st;
         zip = zp;
     }
-    public static Address makeAddress() throws IOException {
+
+    public static Address makeAddress(){
         System.out.println("Address");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String addressName = getInput(br, "Address name : ");

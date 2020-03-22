@@ -4,8 +4,6 @@ import helperclasses.BankingAccount;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static helperclasses.Address.makeAddress;
@@ -17,7 +15,6 @@ public class User {
     String first_name;
     String middle_name;
     String second_name;
-    Date date_of_birth;
     HashSet<Integer> uids = new HashSet<>();
     ArrayList<ShoppingCart> shoppingcarts;
 
@@ -42,6 +39,26 @@ public class User {
     private String[] phonenumber;
     private BankingAccount account;
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public String[] getPhonenumber() {
+        return phonenumber;
+    }
+
+    public BankingAccount getAccount() {
+        return account;
+    }
+
     public User(String id){
         user_id = id;
         first_name = "";
@@ -51,7 +68,6 @@ public class User {
         password = "";
         address = null;
         phonenumber = null;
-        date_of_birth = new Date();
         account = new BankingAccount();
         shoppingcarts = new ArrayList<>();
     }
@@ -64,13 +80,12 @@ public class User {
         password = "";
         address = null;
         phonenumber = null;
-        date_of_birth = new Date();
         account = new BankingAccount();
         shoppingcarts = new ArrayList<>();
 
     }
 
-    public User(String userId, String fname, String sname, String eml, String pass, Address adrs, String[] pnumber, Date dob, BankingAccount acc, ArrayList<ShoppingCart> sc){
+    public User(String userId, String fname, String sname, String eml, String pass, Address adrs, String[] pnumber, BankingAccount acc, ArrayList<ShoppingCart> sc){
         user_id = userId;
         first_name = fname;
         second_name = sname;
@@ -78,7 +93,6 @@ public class User {
         password = pass;
         address = adrs;
         phonenumber = pnumber;
-        date_of_birth = dob;
         account = acc;
         shoppingcarts = sc;
     }
@@ -100,19 +114,25 @@ public class User {
     }
 
 
-    public static User NewUsr(String id) throws IOException, ParseException {
+    public User NewUsr(String id) {
         System.out.println("\u001b[34m------------- Welcome to the BookCafe -------------");
         User newUser = new User(id);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         newUser.first_name = getInput(br, "First Name: ");
         System.out.print("Middle Name (Optional): ");
-        newUser.middle_name = br.readLine();
+        try {
+            newUser.middle_name = br.readLine();
+            if(newUser.middle_name.replaceAll("\\s+","").length() == 0){
+                System.out.println("No middle name added");
+            }
+        } catch (IOException e) {
+            newUser.middle_name = "";
+        }
         newUser.second_name = getInput(br, "Last Name : ");
         newUser.email = getInput(br,"Email : " );
         newUser.password = getInput(br, "Password : ");
         newUser.address = makeAddress();
         newUser.phonenumber = enterPhoneNumber(br);
-        newUser.date_of_birth = new SimpleDateFormat("dd/MM/yyyy").parse(getInput(br, "Date of Birth : "));
         newUser.setAccount(makeAccount());
         return newUser;
     }

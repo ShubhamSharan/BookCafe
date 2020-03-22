@@ -17,7 +17,6 @@ public class Publisher {
     String first_name;
     String middle_name;
     String second_name;
-    Date date_of_birth;
 
 
     private String email;
@@ -27,40 +26,46 @@ public class Publisher {
     private BankingAccount account;
 
     public Publisher(String id){
-        String publisher_id = id;
-        String first_name = "";
-        String middle_name = "";
-        String second_name = "";
-        String email = "";
-        String password = "";
-        Address address = null;
-        String[] phonenumber = null;
-        Date date_of_birth = new Date();
-        BankingAccount account = new BankingAccount();
+        publisher_id = id;
+        first_name = "";
+        middle_name = "";
+        second_name = "";
+        email = "";
+        password = "";
+        address = null;
+        phonenumber = null;
+        account = new BankingAccount();
+    }
+
+    public BankingAccount getAccount() {
+        return account;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String[] getPhonenumber() {
+        return phonenumber;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Address getAddress() {
+        return address;
     }
 
     public Publisher(){
-        String publisher_id = "";
-        String first_name = "";
-        String middle_name = "";
-        String second_name = "";
-        String email = "";
-        String password = "";
-        Address address = null;
-        String[] phonenumber = null;
-        Date date_of_birth = new Date();
-        BankingAccount account = new BankingAccount();
-    }
-    public Publisher( String pid,String fname, String sname, String eml, String pass, Address adrs, String[] pnumber, Date dob, BankingAccount acc){
-        String publisher_id = pid;
-        String first_name = fname;
-        String second_name = sname;
-        String email = eml;
-        String password = pass;
-        Address address = adrs;
-        String[] phonenumber = pnumber;
-        Date date_of_birth = dob;
-        BankingAccount account = acc;
+        first_name = "";
+        middle_name = "";
+        second_name = "";
+        email = "";
+        password = "";
+        address = null;
+        phonenumber = null;
+        account = new BankingAccount();
     }
 
     public void setEmail(String email) {
@@ -83,13 +88,18 @@ public class Publisher {
         this.phonenumber = phonenumber;
     }
 
-    public static Publisher NewUsr(String id) throws IOException, ParseException {
+    public Publisher NewUsr(String id)  {
         System.out.println("\u001b[34m------------- Welcome to the BookCafe -------------");
         Publisher newPublisher = new Publisher(id);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         newPublisher.first_name = getInput(br, "First Name: ");
         System.out.print("Middle Name (Optional): ");
-        newPublisher.middle_name = br.readLine();
+        try {
+            newPublisher.middle_name = br.readLine();
+        } catch (IOException e) {
+            System.out.println("No middle name added");
+            newPublisher.middle_name = "";
+        }
         newPublisher.second_name = getInput(br, "Last Name : ");
         //Login Details
         newPublisher.email = getInput(br,"Email : " );
@@ -97,7 +107,6 @@ public class Publisher {
         //Personal identifiers
         newPublisher.address = makeAddress();
         newPublisher.phonenumber = enterPhoneNumber(br);
-        newPublisher.date_of_birth = new SimpleDateFormat("dd/MM/yyyy").parse(getInput(br, "Date of Birth : "));
         newPublisher.account = makeAccount();
 
         return newPublisher;

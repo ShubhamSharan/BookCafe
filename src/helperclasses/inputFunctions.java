@@ -2,22 +2,24 @@ package helperclasses;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 
 
 public class inputFunctions {
-    public static String getInput(BufferedReader r, String x) throws IOException {
+    public static String getInput(BufferedReader r, String x) {
         System.out.print("* "+x);
-        String temp = r.readLine();
+        String temp = null;
+        try {
+            temp = r.readLine();
+        } catch (IOException e) {
+            System.out.println("Can't be left blank!!");
+        }
         while(true){
             if((temp != null)&&(temp.replaceAll("\\s+","").length()!=0)){
                 System.out.println("value:{"+temp+"}"+temp.length());
@@ -25,16 +27,25 @@ public class inputFunctions {
             }else{
                 System.out.println("This field shouldn't be left blank");
                 System.out.print(x);
-                temp = r.readLine();
+                try {
+                    temp = r.readLine();
+                } catch (IOException e) {
+                    System.out.println("Can't be left blank!!");
+                }
             }
 
         }
         return temp;
     }
 
-    public static String getIDinput(BufferedReader r, String x) throws IOException {
+    public static String getIDinput(BufferedReader r, String x) {
         System.out.print("* "+x);
-        String temp = r.readLine();
+        String temp = null;
+        try {
+            temp = r.readLine();
+        } catch (IOException e) {
+            System.out.println("Can't be left blank!!");
+        }
         while(true){
             if((temp != null)&&(temp.replaceAll("\\s+","").length()==10)){
                 System.out.println("value:{"+temp+"}"+temp.length());
@@ -42,7 +53,11 @@ public class inputFunctions {
             }else{
                 System.out.println("Your "+x+"Shouldn't be less than 10 charectors!");
                 System.out.print(x);
-                temp = r.readLine();
+                try {
+                    temp = r.readLine();
+                } catch (IOException e) {
+                    System.out.println("Can't be left blank!!");
+                }
             }
         }
         return temp;
@@ -64,22 +79,59 @@ public class inputFunctions {
         return uids;
     }
 
+    public static String iDGen(HashSet<String> uids){
+        int selected;
+        while(true){
+            Random rand = new Random();
+            selected = 1000000000+ rand.nextInt(100000000);
+            if(!uids.contains(String.valueOf(selected))){
+                uids.add(String.valueOf(selected));
+                return String.valueOf(selected);
+            }
+        }
+    }
 
 
-    public static String[] enterPhoneNumber(BufferedReader r) throws IOException {
+
+    public static String[] enterPhoneNumber(BufferedReader r){
         String [] ptits ={"Primary Phone","Secondary Phone Number","Other Phone Number"};
         String [] pnum = new String[3];
-        System.out.println("Enter "+ptits[0]+" : ");
+        System.out.println("* Enter "+ptits[0]+" : ");
         while(true){
-            pnum[0] = r.readLine();
-            if(pnum[0] != null){
-                break;
-            }else{System.out.println("This field shouldn't be left blank");}
+            try {
+                pnum[0] = r.readLine();
+                if(pnum[0].replaceAll("\\s+","").length() == 10){
+                    break;
+                }else{
+                    System.out.println("Should be 10 charectors long!");
+                    System.out.println("* Enter "+ptits[0]+" : ");
+                }
+            } catch (IOException e) {
+                System.out.println("Invalid Phone Number");
+            }
         }
         System.out.println("Enter "+ptits[1]+" : ");
-        pnum[1] = r.readLine();
+        try {
+            pnum[1] = r.readLine();
+            if(pnum[1].replaceAll("\\s+","").length() == 0){
+                pnum[1] = "";
+                System.out.println("No "+ptits[2]+ " added");
+            }
+        } catch (IOException e) {
+            System.out.println("No "+ptits[1]+ " added");
+        }
+
         System.out.println("Enter "+ptits[2]+" : ");
-        pnum[2] = r.readLine();
+        try {
+            pnum[2] = r.readLine();
+            if(pnum[2].replaceAll("\\s+","").length() == 0){
+                pnum[2] = "";
+                System.out.println("No "+ptits[2]+ " added");
+            }
+        } catch (IOException e) {
+            System.out.println("No "+ptits[2]+ " added");
+        }
+        System.out.println("Phone Numbers : "+Arrays.toString(pnum));
         return pnum;
 
     }

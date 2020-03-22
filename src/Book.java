@@ -121,7 +121,7 @@ public class Book {
         }
     }
 
-    public Book createBook() throws IOException, ParseException {
+    public Book createBook() {
         Book book = new Book();
         boolean authCheck = true;
 
@@ -145,7 +145,12 @@ public class Book {
         book.book_name = getInput(br,"Enter book name: ");
         book.percentage_to_publisher = Double.parseDouble(getInput(br,"Enter percent to publisher"));
         book.unit_price = Double.parseDouble(getInput(br,"Enter unit price: "));
-        book.date_of_publish = new SimpleDateFormat("dd/MM/yyyy").parse(getInput(br, "Date of Publish : "));
+        try {
+            book.date_of_publish = new SimpleDateFormat("dd/MM/yyyy").parse(getInput(br, "Date of Publish : "));
+        } catch (ParseException e) {
+            System.out.println("Date format was incorrect! Not added");
+            return null;
+        }
         book.number_of_pages = Integer.parseInt(getInput(br,"Number of Pages: "));
         book.quantity = Integer.parseInt(getInput(br,"Quantity: "));
 
