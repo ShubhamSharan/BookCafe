@@ -115,7 +115,7 @@ public class User {
 
 
     public User NewUsr(String id) {
-        System.out.println("\u001b[34m------------- Welcome to the BookCafe -------------");
+        System.out.println("\u001b[34m------------- Welcome New User -------------");
         User newUser = new User(id);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         newUser.first_name = getInput(br, "First Name: ");

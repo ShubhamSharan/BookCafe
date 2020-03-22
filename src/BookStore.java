@@ -116,13 +116,11 @@ public class BookStore {
 
     }
 //2/2/2022
-
     public void NewUser() {
         User newuser = new User();
         newuser = newuser.NewUsr(iDGen(this.uids));
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
-                Statement statement = connection.createStatement()
         ) {
             java.sql.Date sqlDate = new java.sql.Date(newuser.getAccount().expirydetail.getTime());
             System.out.println(sqlDate);
@@ -135,32 +133,30 @@ public class BookStore {
             System.out.println(query);
             PreparedStatement usr = connection.prepareStatement(query);
             usr.execute();
-
         } catch (Exception sqle) {
             System.out.println("Exception SQL: " + sqle);
         }
-
-
     }
-
 
     public void NewPublisher(){
         Publisher newpub = new Publisher();
-        newpub.NewUsr(iDGen(this.uids));
+        newpub = newpub.NewUsr(iDGen(this.uids));
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
-                Statement statement = connection.createStatement()
         ) {
-            PreparedStatement usr = connection.prepareStatement("insert into public.user (isbn,(name).first_name,(name).middle_name,(name).last_name,email,password,(address).address_name,(address).city,(address).state,(address).zip,phone_number,(bank_account).account_name,(bank_account).account_number,(bank_account).expirydate)" +
-                    " values ("+newpub.publisher_id+"','"+newpub.first_name+"','"+newpub.middle_name+"','"+newpub.second_name+"','"+newpub.getEmail()+"','"+newpub.getPassword()+"','"+newpub.getAddress().address_name+"','"+newpub.getAddress().city+"','"+newpub.getAddress().state+"','"+newpub.getAddress().zip+"','"+newpub.getAccount().account_name+"','"+newpub.getAccount().account_number+"','"+newpub.getAccount().expirydetail+"')");
-            usr.execute();
-
+            java.sql.Date sqlDate = new java.sql.Date(newpub.getAccount().expirydetail.getTime());
+            System.out.println("Welcome "+newpub.first_name+" "+newpub.second_name+newpub.getPhonenumber()[0]);
+            String query = "insert into public.publisher " + "(publisher_id,name,email,password,address,phone_number,bank_account)"
+                    +
+                    " values " +
+                    "( '"+ newpub.publisher_id+"',ROW('"+newpub.first_name+"','"+newpub.middle_name+"','"+newpub.second_name+"'),'"+newpub.getEmail()+"','"+newpub.getPassword()+"', ROW('"+newpub.getAddress().address_name+"','"+newpub.getAddress().city+"','"+newpub.getAddress().state+"','"+newpub.getAddress().zip+ "'), array[' "+newpub.getPhonenumber()[0]+"','"+newpub.getPhonenumber()[1]+"','"+newpub.getPhonenumber()[2]+"'] ,ROW ('"+newpub.getAccount().account_name+"',"+newpub.getAccount().account_number+",'"+sqlDate+"'))";
+            System.out.println(query);
+            PreparedStatement pubsr = connection.prepareStatement(query);
+            pubsr.execute();
         } catch (Exception sqle) {
-            System.out.println("Exception: " + sqle);
+            System.out.println("Exception Pub SQL: " + sqle);
         }
-
     }
-
     //Functions
     public void printUsers(){
 
@@ -175,7 +171,6 @@ public class BookStore {
     }
 
     public void search(int option){
-
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
@@ -198,6 +193,8 @@ public class BookStore {
         System.out.println("\uD83D\uDCD6 Book Name - press 2");
         System.out.println("\uD83D\uDCD6 Author name - press 3");
         System.out.println("\uD83D\uDCD6 Genre - press 4");
+        System.out.println("\uD83D\uDCD6 Exit - press 5");
+
         Scanner usrin = new Scanner(System.in);
         boolean flag = true;
         int option;
@@ -205,6 +202,7 @@ public class BookStore {
             System.out.print("\u001b[33mInsert a Single Number and Press enter/ return :");
             option = usrin.nextInt();
             System.out.println("You have entered " + option);
+            if(option==5){System.out.println("Hope you found what you were looking for!");break;}
             if(search_types.get(option)!=null){
                 search(option);
             }else{System.out.println("You have selected an invalid option!");}

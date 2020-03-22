@@ -89,26 +89,28 @@ public class Publisher {
     }
 
     public Publisher NewUsr(String id)  {
-        System.out.println("\u001b[34m------------- Welcome to the BookCafe -------------");
+        System.out.println("\u001b[34m------------- Welcome New Publisher -------------");
         Publisher newPublisher = new Publisher(id);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         newPublisher.first_name = getInput(br, "First Name: ");
         System.out.print("Middle Name (Optional): ");
         try {
             newPublisher.middle_name = br.readLine();
+            if(newPublisher.middle_name.replaceAll("\\s+","").length() == 0){
+                System.out.println("No middle name added");
+            }
         } catch (IOException e) {
             System.out.println("No middle name added");
             newPublisher.middle_name = "";
         }
         newPublisher.second_name = getInput(br, "Last Name : ");
-        //Login Details
         newPublisher.email = getInput(br,"Email : " );
         newPublisher.password = getInput(br, "Password : ");
-        //Personal identifiers
         newPublisher.address = makeAddress();
         newPublisher.phonenumber = enterPhoneNumber(br);
-        newPublisher.account = makeAccount();
-
+        newPublisher.setAccount(makeAccount());
+        java.sql.Date sqlDate = new java.sql.Date(newPublisher.getAccount().expirydetail.getTime());
+        System.out.println(sqlDate);
         return newPublisher;
     }
 
