@@ -2,6 +2,7 @@ package helperclasses;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -77,6 +78,23 @@ public class inputFunctions {
             System.out.println("Exception: " + sqle);
         }
         return uids;
+    }
+
+    public static Name getName(){
+        Name name = new Name();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        name.first_name = getInput(br,"Enter First Name: ");
+        try {
+            System.out.println("Middle name : ");
+            name.middle_name = br.readLine();
+            if(name.middle_name.length() == 0){
+                System.out.println("No middle name added");
+            }
+        } catch (IOException e) {
+            name.middle_name = "";
+        }
+        name.last_name = getInput(br,"Enter Last Name:");
+        return name;
     }
 
     public static String iDGen(HashSet<String> uids){

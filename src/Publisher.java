@@ -4,9 +4,7 @@ import helperclasses.BankingAccount;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
 
 import static helperclasses.Address.makeAddress;
 import static helperclasses.BankingAccount.makeAccount;
@@ -57,38 +55,7 @@ public class Publisher {
         return address;
     }
 
-    public Publisher(){
-        first_name = "";
-        middle_name = "";
-        second_name = "";
-        email = "";
-        password = "";
-        address = null;
-        phonenumber = null;
-        account = new BankingAccount();
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setAccount(BankingAccount account) {
-        this.account = account;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public void setPhonenumber(String[] phonenumber) {
-        this.phonenumber = phonenumber;
-    }
-
-    public Publisher NewUsr(String id)  {
+    public static Publisher NewUsr(String id)  {
         System.out.println("\u001b[34m------------- Welcome New Publisher -------------");
         Publisher newPublisher = new Publisher(id);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -108,9 +75,7 @@ public class Publisher {
         newPublisher.password = getInput(br, "Password : ");
         newPublisher.address = makeAddress();
         newPublisher.phonenumber = enterPhoneNumber(br);
-        newPublisher.setAccount(makeAccount());
-        java.sql.Date sqlDate = new java.sql.Date(newPublisher.getAccount().expirydetail.getTime());
-        System.out.println(sqlDate);
+        newPublisher.account = makeAccount();
         return newPublisher;
     }
 

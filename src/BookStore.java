@@ -22,8 +22,6 @@ public class BookStore {
         this.addSearchTypes();
         addIDs(uids, "public.user", "user_id");
         addIDs(uids,"public.publisher","publisher_id");
-
-
     }
 
     public void addSearchTypes(){
@@ -72,7 +70,6 @@ public class BookStore {
         } catch (Exception sqle) {
             System.out.println("Exception: " + sqle);
         }
-
     }
 
     //Non Static views
@@ -117,8 +114,7 @@ public class BookStore {
     }
 //2/2/2022
     public void NewUser() {
-        User newuser = new User();
-        newuser = newuser.NewUsr(iDGen(this.uids));
+        User newuser = User.NewUsr(iDGen(this.uids));
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
         ) {
@@ -139,8 +135,7 @@ public class BookStore {
     }
 
     public void NewPublisher(){
-        Publisher newpub = new Publisher();
-        newpub = newpub.NewUsr(iDGen(this.uids));
+        Publisher newpub = Publisher.NewUsr(iDGen(this.uids));
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
         ) {
@@ -187,7 +182,6 @@ public class BookStore {
 
     //SearchTool
     public void searchBook(){
-        Book selectedBook = null;
         System.out.println("\u001b[34m------------- Search a Book By -------------");
         System.out.println("\uD83D\uDCD6 ISBN - press 1");
         System.out.println("\uD83D\uDCD6 Book Name - press 2");

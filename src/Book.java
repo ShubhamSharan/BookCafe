@@ -1,4 +1,5 @@
 import helperclasses.Genre;
+import helperclasses.Name;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class Book {
     String ISBN;
     int quantity;
     String book_name;
-    ArrayList<String> authors;
+    ArrayList<Name> authors;
     ArrayList<String> genre;
     String publisher_id;
     int number_of_pages;
@@ -39,7 +40,7 @@ public class Book {
     }
 
 
-    public Book(String isbn, int quant, String bname, ArrayList<String> auths, ArrayList<String> gns, String pid, int pages, double price, double perpub, Date dateop){
+    public Book(String isbn, int quant, String bname, ArrayList<Name> auths, ArrayList<String> gns, String pid, int pages, double price, double perpub, Date dateop){
         ISBN = isbn;
         quantity = quant;
         book_name = bname;
@@ -123,42 +124,42 @@ public class Book {
 
     public Book createBook() {
         Book book = new Book();
-        boolean authCheck = true;
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         book.ISBN = getIDinput(br,"Enter ISBN: "); //make sure 10 charectors
-        book.publisher_id = getInput(br,"Enter Publisger ID: ");
-        if(!foundItem(book.publisher_id,"publisher_id","publisher")){System.out.println("Publisher does't exist");book.publisher_id=null; authCheck=false;}
+        book.book_name = getInput(br,"Enter book name: ");
+        //ADD authors
         int howManyAuthors = Integer.parseInt(getInput(br,"Number of authors: "));
-        int howManyGenres =  Integer.parseInt(getInput(br,"Number of Genres: "));
-
         for(int i=0; i<howManyAuthors;i++){
-            String val = "Author ID : "+i+" : ";
-            String input = getIDinput(br,val);
-            if(!foundItem(input,"author_id","author")){System.out.println("Author does't exist"); authCheck=false;}
-            book.authors.add(input);
+            System.out.println("Author "+i+" : ");
+            Name x = getName();
+            book.authors.add(x);
+            System.out.print("The author added is ");x.printName();
         }
+        //Add Genres
+        int howManyGenres =  Integer.parseInt(getInput(br,"Number of Genres: "));
         for(int i=0; i<howManyGenres;i++){
             String val = "Genre : "+i+" : ";
-            book.authors.add(getIDinput(br,val));
+            book.genre.add(getInput(br,val));
         }
-        book.book_name = getInput(br,"Enter book name: ");
+        //Publisher must exist
+        book.publisher_id = getInput(br,"Enter Publisher ID: ");
+        if(!foundItem(book.publisher_id,"publisher_id","publisher")){
+            System.out.println("Publisher does't exist :  Come back after adding publisher into system!");
+            book.publisher_id=null;
+            return null;
+        }
         book.percentage_to_publisher = Double.parseDouble(getInput(br,"Enter percent to publisher"));
         book.unit_price = Double.parseDouble(getInput(br,"Enter unit price: "));
         try {
-            book.date_of_publish = new SimpleDateFormat("dd/MM/yyyy").parse(getInput(br, "Date of Publish : "));
+            book.date_of_publish = new SimpleDateFormat("d-M-yyyy").parse(getInput(br, "Date of Publish (d-M-yyyy) : "));
         } catch (ParseException e) {
-            System.out.println("Date format was incorrect! Not added");
+            System.out.println("Date format was incorrect! Retry!!");
             return null;
         }
         book.number_of_pages = Integer.parseInt(getInput(br,"Number of Pages: "));
         book.quantity = Integer.parseInt(getInput(br,"Quantity: "));
-
-        if(authCheck){
-            return book;
-        }else{
-            return null;
-        }
+        return book;
     }
 
 

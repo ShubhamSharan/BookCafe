@@ -54,7 +54,7 @@ public class BankingAccount {
         long accnum = Long.parseLong(getInput(br,"Account Number: "));
         Date exp = null;
         try {
-            exp = new SimpleDateFormat("dd-MM-yyyy").parse(getInput(br,"Expiry Date: "));
+            exp = new SimpleDateFormat("d-M-yyyy").parse(getInput(br,"Expiry Date: "));
         } catch (ParseException e) {
             System.out.println("Invalid date format");
         }

@@ -11,12 +11,10 @@ public class CartItem {
                 item_id = 0;
                 ISBN = "";
                 quantity = 0;
-                date_of_purchase = new Date();
         }
         public CartItem(int id, String isbn, int q){
                 item_id = id;
                 ISBN = isbn;
                 quantity = q;
-                date_of_purchase = new Date();
         }
 }

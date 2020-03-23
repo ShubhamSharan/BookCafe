@@ -1,30 +1,37 @@
+import helperclasses.Address;
 import helperclasses.CartItem;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static helperclasses.inputFunctions.getInput;
 
 public class ShoppingCart {
-    String user_id;
     String order_id;
+    String user_id;
     ArrayList<CartItem> cartItems;
-    boolean state_of_purchase;
-
+    String shipment_status;
+    Address shipement_address;
+    Date shipment_placement_date;
+    Date shipment_recieved_date;
+    int cartSize;
 
     public ShoppingCart(String usrID, String ordid){
         user_id = usrID;
         order_id = ordid;
         cartItems = new ArrayList<>();
-        state_of_purchase = false;
+        shipment_status = "Inititiated";
+        shipment_placement_date = new Date();
+        shipment_recieved_date = null;
+        cartSize = cartItems.size();
     }
 
     public void addToCart() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        CartItem item = new CartItem();
-        int item_id = cartItems.size() + 1;
+        int item_id = cartSize + 1;
         String isbn = getInput(br, "Enter 10 digit ISBN number to add to Cart: ");
         int quantity = Integer.parseInt(getInput(br,"Enter Quantity : "));
 
@@ -35,6 +42,7 @@ public class ShoppingCart {
                 quantity = Integer.parseInt(getInput(br,"Enter Quantity : "));
             }else{
                 cartItems.add(new CartItem(item_id,isbn,quantity));
+                cartSize++;
                 break;
             }
         }
