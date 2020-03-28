@@ -22,76 +22,126 @@ CREATE TYPE nametype AS (
     last_name  varchar(255)
 );
 
-CREATE TABLE public.publisher
-(
-    publisher_id varchar(10) not null,
-    name nametype,
-    email varchar(255) not null,
-    password varchar(255) not null,
-    address addressType not null,
-    phone_number varchar(16) array[3],
-    bank_account bankaccounttype not null,
-    primary key (publisher_id)
-);
-
 CREATE TABLE public.user
 (
     user_id varchar(10) not null,
     name nametype,
-    email varchar(255) not null,
+    email varchar(255) not null check (email like '%@%'),
     password varchar(255) not null,
-    address addressType not null,
-    phone_number varchar(16) array[3],
-    bank_account bankaccounttype not null,
+    bank_account bankaccounttype not null check((bank_account).expirydate > now()),
     primary key (user_id)
 );
 
+CREATE TABLE public.user_phone
+(
+	user_id varchar(10) not null,
+	phonenumber varchar(10) not null,
+	primary key (user_id,phonenumber),
+	foreign key (user_id) references public.user on delete cascade
+);
+
+CREATE TABLE public.publisher
+(
+    publisher_id varchar(10) not null,
+    name nametype,
+    email varchar(255) not null check (email like '%@%'),
+    password varchar(255) not null,
+    address addresstype not null,
+    bank_account bankaccounttype not null check((bank_account).expirydate > now()),
+    primary key (publisher_id)
+);
+
+CREATE TABLE public.pub_phone
+(
+	publisher_id varchar(10) not null,
+	phonenumber varchar(10) not null,
+	primary key (publisher_id,phonenumber),
+	foreign key (publisher_id) references public.publisher on delete cascade
+);
+
+CREATE TABLE public.author
+(
+	author_id varchar(10) not null,
+	author_name varchar(255) not null,
+	primary key (author_id)
+);
 
 
-CREATE TABLE public.bookstore
+CREATE TABLE public.book
 (
     isbn varchar(10) not null,
     quantity integer not null default 0,
     book_name varchar(255) not null,
-    author_names name[20],
-    genre varchar(100)[20],
-    publisher_id varchar(10) not null,
     number_of_pages integer not null,
-    unit_price numeric(4,2) not null,
-    precent_to_publisher numeric(3,0) not null,
-    date_of_publish date not null,
-    primary key (isbn),
-	foreign key (publisher_id) references public.publisher
+    unit_price numeric(6,2) not null,
+    date_of_publish date not null check (date_of_publish < now()),
+    primary key (isbn)
 );
 
-CREATE TABLE public.shipment
+CREATE TABLE public.genre
 (
-    shipment_id varchar(10) not null,
-    isbn varchar(10) not null,
-    -- TODO: shipment_status varchar(255) not null,
-    -- TODO: Function requested_quantity integer not null,
-    provided_quantity integer,
-    shipment_placement_date date not null,
-    shipment_recieved_date date,
-    primary key (shipment_id),
-    foreign key (isbn) references public.bookstore
+	isbn varchar(10) not null,
+	genre varchar(255) check (genre in ('fiction', 'non-fiction', 'fantasy', 'educational','crime','cooking','adult','programming','self help'))
 );
 
+CREATE TABLE public.wrote
+(
+	author_id varchar(10),
+	isbn varchar(10),
+	primary key (author_id,isbn),
+	foreign key (author_id) references public.author on delete set null,
+	foreign key (isbn) references public.book on delete cascade
+);
+
+CREATE TABLE public.request
+(
+	publisher_id varchar(10) not null,
+	isbn varchar(10) not null,
+	percent_to_publisher numeric(4,3) not null check (percent_to_publisher < 1) ,
+	requested_quantity varchar(10) not null,
+	request_approved boolean,
+	primary key (publisher_id,isbn),
+	foreign key(isbn) references public.book on delete cascade,
+	foreign key(publisher_id) references public.publisher on delete cascade
+);
+
+CREATE TABLE public.add_to_cart
+(
+	user_id varchar(10) not null ,
+	isbn varchar(10) not null ,
+	quantity integer not null default 0,
+	primary key(user_id,isbn),
+	foreign key(isbn) references public.book on delete cascade,
+	foreign key(user_id) references public.user on delete cascade
+
+);
 
 CREATE TABLE public.shopping_cart
 (
     order_id varchar(10) not null,
-    user_id varchar(10) not null,
-    isbn varchar(10) not null,
-    quantity integer,
-    status_of_purchase varchar(20),
-    primary key (order_id),
-    foreign key (isbn) references public.bookstore,
-	foreign key (user_id) references public.user
+	shipment_address addressType,
+	shipement_placement_date date,
+    primary key (order_id)
 );
 
+CREATE TABLE public.order_tracker
+(
+	order_id varchar(10) not null,
+	user_id varchar(10) not null,
+	shipment_recieved_date date,
+	primary key(order_id),
+	foreign key (user_id) references public.user on delete cascade
+);
 
-
+CREATE TABLE public.shipment_confirmed
+(
+	isbn varchar(10) not null,
+	order_id varchar(10) not null,
+	item_quantity integer,
+	primary key (isbn, order_id),
+	foreign key (isbn) references public.book,
+	foreign key (order_id) references public.shopping_cart
+);
 
 
 
