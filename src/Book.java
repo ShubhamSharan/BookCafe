@@ -16,7 +16,7 @@ public class Book {
     String ISBN;
     int quantity;
     String book_name;
-    ArrayList<Name> authors;
+    ArrayList<String> authors;
     ArrayList<String> genre;
     String publisher_id;
     int number_of_pages;
@@ -36,11 +36,11 @@ public class Book {
         unit_price = 0.0;
         percentage_to_publisher = 0.0;
         date_of_publish = new Date();
-        addIDs(uids, "public.bookstore", "isbn");
+        addIDs(uids, "public.book", "isbn");
     }
 
 
-    public Book(String isbn, int quant, String bname, ArrayList<Name> auths, ArrayList<String> gns, String pid, int pages, double price, double perpub, Date dateop){
+    public Book(String isbn, int quant, String bname, ArrayList<String> auths, ArrayList<String> gns, String pid, int pages, double price, double perpub, Date dateop){
         ISBN = isbn;
         quantity = quant;
         book_name = bname;
@@ -51,42 +51,11 @@ public class Book {
         unit_price = price;
         percentage_to_publisher = perpub;
         date_of_publish = dateop;
-        addIDs(uids, "public.bookstore", "isbn");
-    }
-
-    public String iDGen(){
-        int selected;
-        while(true){
-            Random rand = new Random();
-            selected = 1000000000+ rand.nextInt(100000000);
-            if(!uids.contains(String.valueOf(selected))){
-                uids.add(String.valueOf(selected));
-                return String.valueOf(selected);
-            }
-        }
+        addIDs(uids, "public.book", "isbn");
     }
 
     public void printAuthors(){
-        try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
-                Statement statement = connection.createStatement()
-        ) {
-            ResultSet set = statement.executeQuery("select author_id from bookstore where isbn = "+this.ISBN);
-            Array authors = set.getArray("author_id");
-            String [] ids = (String[]) authors.getArray();
-            set.close();
-            ResultSet item;
-            for(int i=0;i<ids.length;i++){
-                if(ids[i]!=null){
-                    item = statement.executeQuery("select (name).first_name as fname, (name).last_name as lname from author where author_id = "+ids[i]);
-                    while(item.next()){
-                        System.out.print("Author " + i+" : "+item.getString("fname")+" "+item.getString("lname"));
-                    }
-                }
-            }
-        } catch (Exception sqle) {
-            System.out.println("Exception: " + sqle);
-        }
+
     }
     //Book Printing
     public void printBookDetails(){
@@ -117,7 +86,7 @@ public class Book {
                 return true;
             }
         } catch (Exception sqle) {
-            System.out.println("Exception: " + sqle);
+            System.out.println("Exception foundItem: " + sqle);
             return false;
         }
     }
@@ -132,9 +101,13 @@ public class Book {
         int howManyAuthors = Integer.parseInt(getInput(br,"Number of authors: "));
         for(int i=0; i<howManyAuthors;i++){
             System.out.println("Author "+i+" : ");
-            Name x = getName();
-            book.authors.add(x);
-            System.out.print("The author added is ");x.printName();
+            String x = getInput(br,"Enter author_id: ");
+            if(foundItem(x,"author_id","author")){
+                book.authors.add(x);
+            }else{
+                System.out.println("Add valid id");
+                i--;
+            }
         }
         //Add Genres
         int howManyGenres =  Integer.parseInt(getInput(br,"Number of Genres: "));

@@ -39,17 +39,30 @@ public class BookStore {
             return;
         }
         try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
-                Statement statement = connection.createStatement()
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
         ) {
-            ResultSet InsertSet = statement.executeQuery("insert into public.bookstore values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.publisher_id+","+book.number_of_pages+","+book.unit_price+","+book.percentage_to_publisher+")");
-            statement.close();connection.close();
+            java.sql.Date sqlDate = new java.sql.Date(book.date_of_publish.getTime());
+            String query = "insert into public.book" + "(isbn,quantity,book_name,number_of_pages,unit_price,date_of_publish)"+
+                    " values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.number_of_pages+","+book.unit_price+","+sqlDate+");";
+
+            query = query + "insert into public.request (publisher_id,isbn,percent_to_publish,request_quantity,request_approved)"+
+                "values ("+book.publisher_id+","+book.ISBN+","+book.percentage_to_publisher+","+100+",TRUE)";
+            PreparedStatement usr = connection.prepareStatement(query);
+            usr.execute();
+            String authorQuery;
+            for(String author : book.authors)
+            {
+                authorQuery = "insert into public.wrote (author_id,isbn)" + "values ("+author+","+book.ISBN+");";
+                PreparedStatement auths = connection.prepareStatement(authorQuery);
+                auths.execute();
+                auths.close();
+            }
         } catch (Exception sqle) {
-            System.out.println("Exception: " + sqle);
+            System.out.println("Exception addNewBook: " + sqle);
         }
     }
-    //Adding Books to a BookStore via SQL
 
+    //Adding Books to a BookStore via SQL
     public void removeBook(){
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String isbn = getInput(br,"Enter ISBN :");
@@ -57,18 +70,16 @@ public class BookStore {
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
         ) {
-            ResultSet bookDeleted = statement.executeQuery("select isbn from public.bookstore where isbn ="+isbn);
+            ResultSet bookDeleted = statement.executeQuery("select isbn from public.book where isbn ="+isbn);
             if(!bookDeleted.next()){
                 System.out.println(isbn+" doesn't exist in the database");
-                return;
             }else{
                 bookDeleted.close();
-                PreparedStatement rem = connection.prepareStatement("delete from public.bookstore where isbn ="+isbn);
+                PreparedStatement rem = connection.prepareStatement("delete from public.book where isbn ="+isbn);
                 rem.executeUpdate();
             }
-            statement.close();connection.close();
         } catch (Exception sqle) {
-            System.out.println("Exception: " + sqle);
+            System.out.println("Exception 1: " + sqle);
         }
     }
 
@@ -121,11 +132,10 @@ public class BookStore {
             java.sql.Date sqlDate = new java.sql.Date(newuser.getAccount().expirydetail.getTime());
             System.out.println(sqlDate);
 
-            System.out.println("Welcome "+newuser.first_name+" "+newuser.second_name+newuser.getPhonenumber()[0]);
-            String query = "insert into public.user " + "(user_id,name,email,password,address,phone_number,bank_account)"
+            String query = "insert into public.user " + "(user_id,name,email,password,bank_account)"
                     +
                     " values " +
-                    "( '"+ newuser.user_id+"',ROW('"+newuser.first_name+"','"+newuser.middle_name+"','"+newuser.second_name+"'),'"+newuser.getEmail()+"','"+newuser.getPassword()+"', ROW('"+newuser.getAddress().address_name+"','"+newuser.getAddress().city+"','"+newuser.getAddress().state+"','"+newuser.getAddress().zip+ "'), array[' "+newuser.getPhonenumber()[0]+"','"+newuser.getPhonenumber()[1]+"','"+newuser.getPhonenumber()[2]+"'] ,ROW ('"+newuser.getAccount().account_name+"',"+newuser.getAccount().account_number+",'"+sqlDate+"'))";
+                    "( '"+ newuser.user_id+"',ROW('"+newuser.first_name+"','"+newuser.middle_name+"','"+newuser.second_name+"'),'"+newuser.getEmail()+"','"+newuser.getPassword()+"',ROW ('"+newuser.getAccount().account_name+"',"+newuser.getAccount().account_number+",'"+sqlDate+"'))";
             System.out.println(query);
             PreparedStatement usr = connection.prepareStatement(query);
             usr.execute();
@@ -140,11 +150,10 @@ public class BookStore {
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
         ) {
             java.sql.Date sqlDate = new java.sql.Date(newpub.getAccount().expirydetail.getTime());
-            System.out.println("Welcome "+newpub.first_name+" "+newpub.second_name+newpub.getPhonenumber()[0]);
-            String query = "insert into public.publisher " + "(publisher_id,name,email,password,address,phone_number,bank_account)"
+            String query = "insert into public.publisher " + "(publisher_id,name,email,password,address,bank_account)"
                     +
                     " values " +
-                    "( '"+ newpub.publisher_id+"',ROW('"+newpub.first_name+"','"+newpub.middle_name+"','"+newpub.second_name+"'),'"+newpub.getEmail()+"','"+newpub.getPassword()+"', ROW('"+newpub.getAddress().address_name+"','"+newpub.getAddress().city+"','"+newpub.getAddress().state+"','"+newpub.getAddress().zip+ "'), array[' "+newpub.getPhonenumber()[0]+"','"+newpub.getPhonenumber()[1]+"','"+newpub.getPhonenumber()[2]+"'] ,ROW ('"+newpub.getAccount().account_name+"',"+newpub.getAccount().account_number+",'"+sqlDate+"'))";
+                    "( '"+ newpub.publisher_id+"',ROW('"+newpub.first_name+"','"+newpub.middle_name+"','"+newpub.second_name+"'),'"+newpub.getEmail()+"','"+newpub.getPassword()+"', ROW('"+newpub.getAddress().address_name+"','"+newpub.getAddress().city+"','"+newpub.getAddress().state+"','"+newpub.getAddress().zip+ "') ,ROW ('"+newpub.getAccount().account_name+"',"+newpub.getAccount().account_number+",'"+sqlDate+"'))";
             System.out.println(query);
             PreparedStatement pubsr = connection.prepareStatement(query);
             pubsr.execute();
@@ -168,15 +177,10 @@ public class BookStore {
     public void search(int option){
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
-                Statement statement = connection.createStatement()
         ) {
-            ResultSet aSet = statement.executeQuery("select * from author");
-            while(aSet.next()){
 
-            }
-            statement.close();connection.close();
         } catch (Exception sqle) {
-            System.out.println("Exception: " + sqle);
+            System.out.println("Exception search: " + sqle);
         }
     }
 
@@ -185,8 +189,8 @@ public class BookStore {
         System.out.println("\u001b[34m------------- Search a Book By -------------");
         System.out.println("\uD83D\uDCD6 ISBN - press 1");
         System.out.println("\uD83D\uDCD6 Book Name - press 2");
-        System.out.println("\uD83D\uDCD6 Author name - press 3");
-        System.out.println("\uD83D\uDCD6 Genre - press 4");
+        System.out.println("\uD83D\uDCD6 Author name - press 3"); //different table
+        System.out.println("\uD83D\uDCD6 Genre - press 4"); //different table
         System.out.println("\uD83D\uDCD6 Exit - press 5");
 
         Scanner usrin = new Scanner(System.in);

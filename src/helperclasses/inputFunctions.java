@@ -71,11 +71,11 @@ public class inputFunctions {
         ) {
             ResultSet aSet = statement.executeQuery("select "+columnname+" from "+tablename);
             while(aSet.next()){
-                uids.add(aSet.getString("isbn"));
+                uids.add(aSet.getString(columnname));
             }
-
         } catch (Exception sqle) {
-            System.out.println("Exception: " + sqle);
+            System.out.print("Tablename: "+tablename+" columnname: "+columnname);
+            System.out.println(" Exception addIDs: " + sqle);
         }
         return uids;
     }

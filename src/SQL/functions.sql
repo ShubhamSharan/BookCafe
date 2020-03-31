@@ -1,16 +1,23 @@
-CREATE FUNCTION searchTableAtomic(val varchar(10), columnName varchar(255))
+DROP FUNCTION IF EXISTS SearchByIsbn(val varchar(10));
+
+CREATE FUNCTION SearchByIsbn(val varchar(10))
 	RETURNS TABLE(
 		isbn varchar(10),
 		quantity integer,
 		book_name varchar(255),
-		author_id varchar(10)[20],
-		genre varchar(100)[20],
-		publisher_id varchar(10),
 		number_of_pages integer,
 		unit_price numeric(4,2),
-		precent_to_publisher numeric(3,0),
-		date_of_publish date)
-	return table(
-		select * from public.bookstore
-		where public.bookstore.columnName LIKE '%'+val+'%' OR bookstore.columnName = val;
-	);
+		date_of_publish date) AS $$
+		DECLARE
+		BEGIN
+		RETURN QUERY
+			select book.isbn,book.quantity,book.book_name,book.number_of_pages,book.unit_price,book.date_of_publish
+			from public.book
+			where public.book.isbn LIKE '%SearchByIsbn.val%' OR
+			public.book.isbn = val OR
+			public.book.isbn LIKE 'SearchByIsbn.val%' OR
+			public.book.isbn LIKE '%SearchByIsbn.val';
+		END;
+$$ LANGUAGE plpgsql;
+
+select * from searchByIsbn('000811613X');

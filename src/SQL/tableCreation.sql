@@ -15,7 +15,6 @@ CREATE TYPE addresstype AS
     zip varchar(15)
 );
 
-
 CREATE TYPE nametype AS (
     first_name  varchar(255),
     middle_name   varchar(255),
