@@ -24,7 +24,7 @@ CREATE TYPE nametype AS (
 CREATE TABLE public.user
 (
     user_id varchar(10) not null,
-	user_type boolean, --is publisher
+	user_type boolean not null, --is publisher
     name nametype,
     email varchar(255) not null check (email like '%@%'),
     password varchar(255) not null,
@@ -65,10 +65,14 @@ CREATE TABLE public.book
 (
     isbn varchar(10) not null,
     quantity integer not null default 0,
-    book_name varchar(255) not null,
+    book_name varchar(355) not null,
     number_of_pages integer not null,
     unit_price numeric(6,2) not null,
     date_of_publish date not null check (date_of_publish < now()),
+	percent_to_publisher numeric(4,3) not null check (percent_to_publisher < 1) ,
+	requested_quantity varchar(10) not null,
+	last_request_date date not null,
+	request_approved boolean,
     primary key (isbn)
 );
 
@@ -89,34 +93,14 @@ CREATE TABLE public.genre
 	genre varchar(255) check (genre in ('fiction', 'non-fiction', 'fantasy', 'educational','crime','cooking','adult','programming','self help'))
 );
 
-CREATE TABLE public.published
-(
-	publisher_id varchar(10) not null,
-	isbn varchar(10) not null,
-	percent_to_publisher numeric(4,3) not null check (percent_to_publisher < 1) ,
-	requested_quantity varchar(10) not null,
-	request_approved boolean,
-	primary key (isbn),
-	foreign key(isbn) references public.book on delete cascade,
-	foreign key(publisher_id) references public.publisher on delete cascade
-);
-
 
 CREATE TABLE public.shopping_cart
 (
     order_id varchar(10) not null,
+	user_id varchar(10) not null,
 	shipment_address addressType,
 	shipement_placement_date date,
-    primary key (order_id)
-);
-
-CREATE TABLE public.order_tracker
-(
-	order_id varchar(10) not null,
-	user_id varchar(10) not null,
-	shipment_recieved_date date,
-	primary key(order_id),
-	foreign key (order_id) references public.shopping_cart on delete cascade,
+    primary key (order_id),
 	foreign key (user_id) references public.user on delete cascade
 );
 
