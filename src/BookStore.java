@@ -29,6 +29,7 @@ public class BookStore {
         search_types.put(2,"book_name");
         search_types.put(3,"authors");
         search_types.put(4,"genres");
+        search_types.put(5,"publisher_id");
     }
 
 
@@ -80,7 +81,7 @@ public class BookStore {
         Scanner usrin = new Scanner(System.in);
         Publisher expub;
         expub = Publisher.checkPub();
-        System.out.println("\uD83C\uDF4E Publisher_id :"+ expub.publisher_id );
+        System.out.println("\n\n\uD83C\uDF4E Publisher_id :"+ expub.publisher_id );
         System.out.println("\uD83C\uDF4E Welcome back:"+ expub.first_name + " " + expub.second_name);
 
         boolean flag = true;
@@ -90,7 +91,7 @@ public class BookStore {
             int option = usrin.nextInt();
             System.out.println("You have entered " + option);
             switch(option){
-                case 1: expub.searchMyBooks();System.out.println("\uD83D\uDC4B Back to menu");break;
+                case 1: search(5,expub.publisher_id);System.out.println("\uD83D\uDC4B Back to menu");break;
                 case 2: expub.viewMyBooks();System.out.println("\uD83D\uDC4B Back to menu");break;
                 case 3: expub.checkSales();System.out.println("\uD83D\uDC4B Back to menu");break;
                 case 4: flag = false; System.out.println("\uD83D\uDC4B Goodbye Publisher - Logged Out"); break;
@@ -151,7 +152,7 @@ public class BookStore {
             String query = "select * from SearchByAtomic('"+input+"','book."+search_types.get(option)+"');";
             System.out.println(query);
             ResultSet result = statement.executeQuery(query);
-            System.out.println("=================================================Your Books are==================================================\n");
+            System.out.println("=============================================== Your Books Are ================================================\n");
             while(result.next()){
                 System.out.println("=============================================================================================================");
                 System.out.println("\uD83E\uDD3E\uD83C\uDFFC\u200DISBN             : "+result.getString("isbn"));
