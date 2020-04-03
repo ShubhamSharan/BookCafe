@@ -135,5 +135,56 @@ public class Book {
         return book;
     }
 
+    public static void removeBook(){
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String isbn = getInput(br,"Enter ISBN :");
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            ResultSet bookDeleted = statement.executeQuery("select isbn from public.book where isbn ="+isbn);
+            if(!bookDeleted.next()){
+                System.out.println(isbn+" doesn't exist in the database");
+            }else{
+                bookDeleted.close();
+                PreparedStatement rem = connection.prepareStatement("delete from public.book where isbn ="+isbn);
+                rem.executeUpdate();
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+
+    public static void addNewBook(){
+        Book book = new Book();
+        book = book.createBook();
+        if(book == null){
+            System.out.println("Make sure the book is created correctly!");
+            return;
+        }
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
+        ) {
+            java.sql.Date sqlDate = new java.sql.Date(book.date_of_publish.getTime());
+            String query = "insert into public.book" + "(isbn,quantity,book_name,number_of_pages,unit_price,date_of_publish)"+
+                    " values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.number_of_pages+","+book.unit_price+","+sqlDate+");";
+
+            query = query + "insert into public.request (publisher_id,isbn,percent_to_publish,request_quantity,request_approved)"+
+                    "values ("+book.publisher_id+","+book.ISBN+","+book.percentage_to_publisher+","+100+",TRUE)";
+            PreparedStatement usr = connection.prepareStatement(query);
+            usr.execute();
+            String authorQuery;
+            for(String author : book.authors)
+            {
+                authorQuery = "insert into public.wrote (author_id,isbn)" + "values ("+author+","+book.ISBN+");";
+                PreparedStatement auths = connection.prepareStatement(authorQuery);
+                auths.execute();
+                auths.close();
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception addNewBook: " + sqle);
+        }
+    }
+
 
 }

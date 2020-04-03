@@ -48,4 +48,15 @@ public class ShoppingCart {
         }
     }
 
+
+    public static void printShipments(){
+
+    }
+
+    public static void checkShipments(){
+
+    }
+
+
+
 }

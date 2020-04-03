@@ -13,6 +13,7 @@ public class menus {
     public static void ExUserView(){
         System.out.println("\u001b[34m------------- Menu -------------");
         System.out.println("\uD83D\uDCD6 Search for a book press 1 ");
+        System.out.println("\uD83D\uDCD6 View all your Books 2 ");
         System.out.println("\uD83D\uDCD6 Check your orders 2");
         System.out.println("\uD83D\uDCD6 Check profile details 3");
     }
@@ -33,5 +34,14 @@ public class menus {
         System.out.println("\uD83D\uDCD6 Search your books press 1 ");
         System.out.println("\uD83D\uDCD6 Check Sales Account Status press 2");
         System.out.println("\uD83D\uDCD6 Check profile details 3");
+    }
+
+    public static void SearchMenu(){
+        System.out.println("\u001b[34m------------- Search Book By -------------");
+        System.out.println("\uD83D\uDCD6 ISBN - press 1 ");
+        System.out.println("\uD83D\uDCD6 Book name - press 2");
+        System.out.println("\uD83D\uDCD6 Author Name - press 3");
+        System.out.println("\uD83D\uDCD6 Genre - press 4"); //different table
+        System.out.println("\uD83D\uDCD6 Exit - press 5");
     }
 }

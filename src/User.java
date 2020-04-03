@@ -87,4 +87,13 @@ public class User {
         return newUser;
     }
 
+    public static void printUsers(){
+
+    }
+
+    public static void checkProfile(){
+
+    }
+
+
 }
