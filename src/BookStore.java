@@ -154,15 +154,15 @@ public class BookStore {
             System.out.println("=================================================Your Books are==================================================\n");
             while(result.next()){
                 System.out.println("=============================================================================================================");
-                System.out.println("ISBN             : "+result.getString("isbn"));
-                System.out.println("    Quantity         : "+result.getString("quantity"));
-                System.out.println("    Book Name        : "+result.getString("book_name"));
-                System.out.println("    Number Of Pages  : "+result.getString("number_of_pages"));
-                System.out.println("    Unit Price       : $"+result.getString("unit_price"));
-                System.out.println("    Date of Publish  : "+result.getString("date_of_publish"));
-                System.out.println("    Publisher Name   : "+result.getString("publisher_name"));
-                System.out.println("    Authors          : "+result.getString("authors"));
-                System.out.println("    Genres           : "+result.getString("genres"));
+                System.out.println("\uD83E\uDD3E\uD83C\uDFFC\u200DISBN             : "+result.getString("isbn"));
+                System.out.println("    \uD83D\uDD0BQuantity         : "+result.getString("quantity"));
+                System.out.println("    \uD83D\uDCD3Book Name        : "+result.getString("book_name"));
+                System.out.println("    \uD83C\uDFA7Number Of Pages  : "+result.getString("number_of_pages"));
+                System.out.println("    \uD83D\uDC41Unit Price       : $"+result.getString("unit_price"));
+                System.out.println("    \uD83D\uDCC6Date of Publish  : "+result.getString("date_of_publish"));
+                System.out.println("    \uD83E\uDD39\u200D️Publisher Name   : "+result.getString("publisher_name"));
+                System.out.println("    \uD83D\uDC68\uD83C\uDFFB\u200D\uD83C\uDFA8Authors          : "+result.getString("authors"));
+                System.out.println("    \uD83E\uDDE0Genres           : "+result.getString("genres"));
                 System.out.println("=============================================================================================================\n");
             }
 
