@@ -28,7 +28,7 @@ public class BookStore {
         search_types.put(1,"isbn");
         search_types.put(2,"book_name");
         search_types.put(3,"authors");
-        search_types.put(4,"genres");
+        search_types.put(4,"genre");
         search_types.put(5,"publisher_id");
     }
 
@@ -36,6 +36,14 @@ public class BookStore {
 
     //Non Static views
     public void Admin(){
+        BufferedReader br =  new BufferedReader(new InputStreamReader(System.in));
+        User exusr = null;
+        while (exusr==null){
+            exusr = User.checkUser("Admin");
+            if(exusr==null){
+                int exit = Integer.parseInt(getInput(br,"Click 1 if you wanna exit and 0 if you wanna retry :"));
+                if(exit==1){return;}}
+        }
         System.out.println("\u001b[35mWELCOME ADMIN \uD83D\uDCDA \uD83E\uDD13");
         Scanner usrin = new Scanner(System.in);
         boolean flag = true;
@@ -61,6 +69,14 @@ public class BookStore {
 
     public void ExUser(){
         Scanner usrin = new Scanner(System.in);
+        BufferedReader br =  new BufferedReader(new InputStreamReader(System.in));
+        User exusr = null;
+        while (exusr==null){
+            exusr = User.checkUser("User");
+            if(exusr==null){
+                int exit = Integer.parseInt(getInput(br,"Click 1 if you wanna exit and 0 if you wanna retry :"));
+                if(exit==1){return;}}
+        }
         boolean flag = true;
         while (flag){
             ExUserView();
@@ -69,9 +85,9 @@ public class BookStore {
             System.out.println("You have entered " + option);
             switch(option){
                 case 1: searchBook();System.out.println("\uD83D\uDC4B Back to menu");break;
-                case 5: ShoppingCart.checkShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 6: User.checkProfile();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 7: flag = false; System.out.println("\uD83D\uDC4B Goodbye Admin"); break;
+                case 2: ShoppingCart.checkShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 3: User.checkProfile();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 4: flag = false; System.out.println("\uD83D\uDC4B Goodbye Admin"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
         }
@@ -79,8 +95,14 @@ public class BookStore {
 
     public void ExPublisher(){
         Scanner usrin = new Scanner(System.in);
-        Publisher expub;
-        expub = Publisher.checkPub();
+        BufferedReader br =  new BufferedReader(new InputStreamReader(System.in));
+        Publisher expub = null;
+        while (expub==null){
+            expub = Publisher.checkPub();
+            if(expub==null){
+                int exit = Integer.parseInt(getInput(br,"Click 1 if you wanna exit and 0 if you wanna retry :"));
+                if(exit==1){return;}}
+        }
         System.out.println("\n\n\uD83C\uDF4E Publisher_id :"+ expub.publisher_id );
         System.out.println("\uD83C\uDF4E Welcome back:"+ expub.first_name + " " + expub.second_name);
 

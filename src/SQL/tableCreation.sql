@@ -59,7 +59,7 @@ CREATE TABLE public.pub_phone
 	primary key (publisher_id,phonenumber),
 	foreign key (publisher_id) references public.publisher on delete cascade
 );
-
+--Admin
 
 CREATE TABLE public.book
 (
@@ -73,7 +73,9 @@ CREATE TABLE public.book
 	requested_quantity varchar(10) not null,
 	last_request_date date not null,
 	request_approved boolean,
-    primary key (isbn)
+	publisher_id varchar(10),
+    primary key (isbn),
+	foreign key (publisher_id) references public.publisher
 );
 
 
@@ -83,14 +85,16 @@ CREATE TABLE public.author
 	author_name varchar(255) not null,
 	isbn varchar(10) not null,
 	primary key (author_id,isbn),
-	foreign key (isbn) references public.book
+	foreign key (isbn) references public.book on delete cascade
 );
 
 
 CREATE TABLE public.genre
 (
 	isbn varchar(10) not null,
-	genre varchar(255) check (genre in ('fiction', 'non-fiction', 'fantasy', 'educational','crime','cooking','adult','programming','self help'))
+	genre varchar(255) check (genre in ('fiction', 'kids','non-fiction', 'fantasy', 'educational','crime','cooking','adult','programming','self help')),
+	primary key (isbn,genre),
+	foreign key (isbn) references public.book on delete cascade
 );
 
 

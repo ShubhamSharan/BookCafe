@@ -142,12 +142,12 @@ public class Book {
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
         ) {
-            ResultSet bookDeleted = statement.executeQuery("select isbn from public.book where isbn ="+isbn);
+            ResultSet bookDeleted = statement.executeQuery("select isbn from public.book where public.book.isbn = '"+isbn+"'");
             if(!bookDeleted.next()){
                 System.out.println(isbn+" doesn't exist in the database");
             }else{
                 bookDeleted.close();
-                PreparedStatement rem = connection.prepareStatement("delete from public.book where isbn ="+isbn);
+                PreparedStatement rem = connection.prepareStatement("delete from public.book where public.book.isbn = '"+isbn+"'");
                 rem.executeUpdate();
             }
         } catch (Exception sqle) {
