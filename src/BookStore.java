@@ -13,25 +13,34 @@ public class BookStore {
     String book_store_name;
     // Trackers
     HashSet<String> uids;
+    HashMap<Integer,String> search_titles = new HashMap<>();
     HashMap<Integer,String> search_types = new HashMap<>();
+
 
     //No Data iun DB
     public BookStore(String bsn){
         book_store_name = bsn;
         uids = new HashSet<>();
         this.addSearchTypes();
+        this.addSearchTitles();
         addIDs(uids, "public.user", "user_id");
         addIDs(uids,"public.publisher","publisher_id");
     }
 
     public void addSearchTypes(){
-        search_types.put(1,"isbn");
-        search_types.put(2,"book_name");
-        search_types.put(3,"authors");
-        search_types.put(4,"genre");
+        search_types.put(1,"book.isbn");
+        search_types.put(2,"book.book_name");
+        search_types.put(3,"author.author_name");
+        search_types.put(4,"genre.genre");
         search_types.put(5,"publisher_id");
     }
-
+    public void addSearchTitles(){
+        search_titles.put(1," Book ISBN ");
+        search_titles.put(2," Book name ");
+        search_titles.put(3," Author Name ");
+        search_titles.put(4," Genre ");
+        search_titles.put(5," Publisher ID ");
+    }
 
 
     //Non Static views
@@ -171,7 +180,7 @@ public class BookStore {
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
         ) {
-            String query = "select * from SearchByAtomic('"+input+"','book."+search_types.get(option)+"');";
+            String query = "select * from SearchByAtomic('"+input+"','"+search_types.get(option)+"');";
             System.out.println(query);
             ResultSet result = statement.executeQuery(query);
             System.out.println("=============================================== Your Books Are ================================================\n");
@@ -207,7 +216,7 @@ public class BookStore {
             System.out.println("You have entered " + option);
             if(option==5){System.out.println("Hope you found what you were looking for!");break;}
             if(search_types.get(option)!=null){
-                String statement = "Enter your" + search_types.get(option) + " : ";
+                String statement = "Enter your" + search_titles.get(option) + " : ";
                 String input = getInput(br,statement);
                 search(option,input);
             }else{System.out.println("You have selected an invalid option!");}

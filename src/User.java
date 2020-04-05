@@ -109,6 +109,7 @@ public class User {
             if(!usr.next()){
                 System.out.println("This user doesn't exist");
             }
+            //-- update public.user set user_type = false where user_id = '1000000004'
             else if(type == "Admin"){
                 String id = usr.getString("user_id");
                 String fname = usr.getString("first_name");
