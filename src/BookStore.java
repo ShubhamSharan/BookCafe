@@ -12,9 +12,9 @@ import static helperclasses.menus.*;
 public class BookStore {
     String book_store_name;
     // Trackers
-    HashSet<String> uids;
-    HashMap<Integer,String> search_titles = new HashMap<>();
-    HashMap<Integer,String> search_types = new HashMap<>();
+    HashSet<String> uids; //For publisher and users
+    public static HashMap<Integer,String> search_titles = new HashMap<>();
+    public static HashMap<Integer,String> search_types = new HashMap<>();
 
 
     //No Data iun DB
@@ -94,8 +94,8 @@ public class BookStore {
             System.out.println("You have entered " + option);
             switch(option){
                 case 1: searchBook();System.out.println("\uD83D\uDC4B Back to menu");break;
-                case 2: ShoppingCart.checkShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 3: User.checkProfile();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 2: exusr.checkShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 3: exusr.checkProfile();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 4: flag = false; System.out.println("\uD83D\uDC4B Goodbye Admin"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
@@ -133,9 +133,10 @@ public class BookStore {
     }
 //2/2/2022
     public void NewUser() {
-        User newuser = User.NewUsr(iDGen(this.uids));
+        String id = iDGen(this.uids);
+        User newuser = User.NewUsr(id);
         try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
         ) {
             java.sql.Date sqlDate = new java.sql.Date(newuser.getAccount().expirydetail.getTime());
             System.out.println(sqlDate);
@@ -147,15 +148,17 @@ public class BookStore {
             System.out.println(query);
             PreparedStatement usr = connection.prepareStatement(query);
             usr.execute();
+            uids.add(id);
         } catch (Exception sqle) {
             System.out.println("Exception SQL: " + sqle);
         }
     }
 
     public void NewPublisher(){
-        Publisher newpub = Publisher.NewUsr(iDGen(this.uids));
+        String id = iDGen(this.uids);
+        Publisher newpub = Publisher.NewUsr(id);
         try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
 
         ) {
             java.sql.Date sqlDate = new java.sql.Date(newpub.getAccount().expirydetail.getTime());
@@ -166,6 +169,7 @@ public class BookStore {
             System.out.println(query);
             PreparedStatement pubsr = connection.prepareStatement(query);
             pubsr.execute();
+            uids.add(id);
         } catch (Exception sqle) {
             System.out.println("Exception Pub SQL: " + sqle);
         }
@@ -175,7 +179,7 @@ public class BookStore {
 
     }
 
-    public void search(int option, String input){
+    public static void search(int option, String input){
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
@@ -204,17 +208,16 @@ public class BookStore {
     }
 
     //SearchTool
-    public void searchBook(){
+    public static void searchBook(){
         Scanner usrin = new Scanner(System.in);
         BufferedReader br =  new BufferedReader(new InputStreamReader(System.in));
-        boolean flag = true;
         int option;
-        while (flag){
+        while (true){
             SearchMenu();
             System.out.print("\u001b[33mInsert a Single Number and Press enter/ return :");
             option = usrin.nextInt();
             System.out.println("You have entered " + option);
-            if(option==5){System.out.println("Hope you found what you were looking for!");break;}
+            if(option==5){System.out.println("Hope you found what you were looking for!"); break;}
             if(search_types.get(option)!=null){
                 String statement = "Enter your" + search_titles.get(option) + " : ";
                 String input = getInput(br,statement);

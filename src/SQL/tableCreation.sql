@@ -81,7 +81,7 @@ CREATE TABLE public.book
 
 CREATE TABLE public.author
 (
-	author_id varchar(10) not null,
+	author_id serial unique not null,
 	author_name varchar(255) not null,
 	isbn varchar(10) not null,
 	primary key (author_id,isbn),

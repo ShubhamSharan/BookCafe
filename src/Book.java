@@ -71,25 +71,6 @@ public class Book {
         return null;
     }
 
-    public boolean foundItem(String id, String columnname, String tablename){
-        try (
-                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
-                Statement statement = connection.createStatement()
-        ) {
-            ResultSet set = statement.executeQuery("select "+columnname+" from public."+tablename+" where "+columnname+" = '"+id+"'");
-            if (set.next() == false) {
-                System.out.println("No such"+id+"exisits in "+tablename);
-                statement.close();connection.close();
-                return false;
-            }else{
-                statement.close();connection.close();
-                return true;
-            }
-        } catch (Exception sqle) {
-            System.out.println("Exception foundItem: " + sqle);
-            return false;
-        }
-    }
 
     public Book createBook() {
         Book book = new Book();
@@ -101,13 +82,8 @@ public class Book {
         int howManyAuthors = Integer.parseInt(getInput(br,"Number of authors: "));
         for(int i=0; i<howManyAuthors;i++){
             System.out.println("Author "+i+" : ");
-            String x = getInput(br,"Enter author_id: ");
-            if(foundItem(x,"author_id","author")){
-                book.authors.add(x);
-            }else{
-                System.out.println("Add valid id");
-                i--;
-            }
+            String x = getInput(br,"Enter author full name: ");
+            book.authors.add(x);
         }
         //Add Genres
         int howManyGenres =  Integer.parseInt(getInput(br,"Number of Genres: "));
@@ -165,18 +141,18 @@ public class Book {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
         ) {
-            java.sql.Date sqlDate = new java.sql.Date(book.date_of_publish.getTime());
-            String query = "insert into public.book" + "(isbn,quantity,book_name,number_of_pages,unit_price,date_of_publish)"+
-                    " values ("+book.ISBN+","+book.quantity+","+book.book_name+","+book.number_of_pages+","+book.unit_price+","+sqlDate+");";
+            java.sql.Date pubDate = new java.sql.Date(book.date_of_publish.getTime());
+            Date date = new Date();
+            java.sql.Date reqDate = new java.sql.Date(date.getTime());
 
-            query = query + "insert into public.request (publisher_id,isbn,percent_to_publish,request_quantity,request_approved)"+
-                    "values ("+book.publisher_id+","+book.ISBN+","+book.percentage_to_publisher+","+100+",TRUE)";
+            String query = "insert into public.book (isbn,quantity,book_name,number_of_pages,unit_price,date_of_publish,publisher_id,percent_to_publish,request_quantity,request_approved,last_request_date )"+
+                    " values ('"+book.ISBN+"',"+book.quantity+",'"+book.book_name+"',"+book.number_of_pages+","+book.unit_price+",'"+pubDate+"','"+book.publisher_id+"',"+book.percentage_to_publisher+","+100+",TRUE,"+reqDate+")";
             PreparedStatement usr = connection.prepareStatement(query);
             usr.execute();
             String authorQuery;
             for(String author : book.authors)
             {
-                authorQuery = "insert into public.wrote (author_id,isbn)" + "values ("+author+","+book.ISBN+");";
+                authorQuery = "insert into public.author (author_name,isbn)" + "values ("+author+",'"+book.ISBN+"');";
                 PreparedStatement auths = connection.prepareStatement(authorQuery);
                 auths.execute();
                 auths.close();

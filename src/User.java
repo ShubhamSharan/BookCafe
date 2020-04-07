@@ -4,16 +4,19 @@ import helperclasses.BankingAccount;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.*;
 
 import static helperclasses.Address.makeAddress;
 import static helperclasses.BankingAccount.makeAccount;
 import static helperclasses.inputFunctions.*;
+import static helperclasses.menus.ShipmentMenu;
 
 public class User {
+    //Trackers
+    HashSet<String> ordersuids = new HashSet<>();
+    HashMap<String,ShoppingCart> currentCarts;
+
     String user_id;
     String first_name;
     String middle_name;
@@ -55,6 +58,8 @@ public class User {
         address = null;
         phonenumber = null;
         account = new BankingAccount();
+        addIDs(ordersuids, "public.shopping_cart", "order_id");
+        currentCarts = new HashMap<>();
     }
 
     public User(String userId, String fname, String sname){
@@ -66,6 +71,8 @@ public class User {
         address = null;
         phonenumber = null;
         account = new BankingAccount();
+        addIDs(ordersuids, "public.shopping_cart", "order_id");
+        currentCarts = new HashMap<>();
     }
 
     public static User NewUsr(String id) {
@@ -92,6 +99,30 @@ public class User {
     }
 
     public static void printUsers(){
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query ="select * from UserDets('')";
+            ResultSet usr = statement.executeQuery(query);
+            if(!usr.next()){
+                System.out.println("No existing carts available");
+                return;
+            }
+            System.out.println("================================================== U S E R S ===================================================");
+            while(usr.next()){
+                System.out.println("============================================================================================================");
+                System.out.println("\uD83D\uDCF8User ID           : "+usr.getString("user_id"));
+                System.out.println("\uD83D\uDCF8First Name        : "+usr.getString("first_name"));
+                System.out.println("\uD83D\uDCF8Middle Name       : "+usr.getString("middle_name"));
+                System.out.println("\uD83D\uDCF8Last Name         : "+usr.getString("last_name"));
+                System.out.println("\uD83D\uDCF8Email             : "+usr.getString("email"));
+                System.out.println("\uD83D\uDCF8Address           : "+usr.getString("address"));
+                System.out.println("============================================================================================================\n\n");
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
 
     }
 
@@ -110,16 +141,16 @@ public class User {
                 System.out.println("This user doesn't exist");
             }
             //-- update public.user set user_type = false where user_id = '1000000004'
-            else if(type == "Admin"){
+            else if(type.equals("Admin")){
                 String id = usr.getString("user_id");
                 String fname = usr.getString("first_name");
                 String lname = usr.getString("last_name");
-                Boolean iden = Boolean.getBoolean(usr.getString("user_type"));
+                boolean iden = Boolean.getBoolean(usr.getString("user_type"));
 //                System.out.println(iden);
                 if(!iden){ return new User(id,fname,lname); }
                 else{ return null;}
             }
-            else if(type == "User"){
+            else if(type.equals("User")){
                 String id = usr.getString("user_id");
                 String fname = usr.getString("first_name");
                 String lname = usr.getString("last_name");
@@ -131,9 +162,197 @@ public class User {
         return null;
     }
 
-    public static void checkProfile(){
+    public void checkProfile(){
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query ="select * from UserDets('"+this.user_id+"')";
+            ResultSet usr = statement.executeQuery(query);
+            if(!usr.next()){
+                System.out.println("No existing carts available");
+                return;
+            }
+            System.out.println("========================================= Y O U R == P R O F I L E =========================================");
+            while(usr.next()){
+                System.out.println("============================================================================================================");
+                System.out.println("User ID           : "+usr.getString("user_id"));
+                System.out.println("First Name        : "+usr.getString("first_name"));
+                System.out.println("Middle Name       : "+usr.getString("middle_name"));
+                System.out.println("Last Name         : "+usr.getString("last_name"));
+                System.out.println("Email             : "+usr.getString("email"));
+                System.out.println("Address           : "+usr.getString("address"));
+                System.out.println("============================================================================================================\n");
 
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
     }
+
+    public ShoppingCart addNewCart(){
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("New Cart--------------------------------");
+        int address = Integer.parseInt(getInput(br,"Press 1 to use registered address info and 0 for new address info: "));
+        ShoppingCart newCart = new ShoppingCart(this.user_id,iDGen(ordersuids));
+        if(address==1){
+            newCart.shipement_address = this.address;
+        }else{
+            newCart.shipement_address = makeAddress();
+        }
+        try (
+            Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
+        ) {
+            String query = "insert into public.user " + "(oder_id,user_id,shipement_address)"
+                    +
+                    " values " +
+                    "( '"+ newCart.order_id+"','"+newCart.user_id+"', ROW('"+newCart.shipement_address.address_name+"','"+newCart.shipement_address.city+"','"+newCart.shipement_address.state+"','"+newCart.shipement_address.zip+"') )";
+            System.out.println(query);
+            PreparedStatement newcart = connection.prepareStatement(query);
+            newcart.execute();
+            newcart.close();
+            int addElemenets = Integer.parseInt(getInput(br,"Would you like to add elements to this new cart? (Press 1 if yes, 0 otherwise) : "));
+            if(addElemenets==1){
+                addTo(newCart);
+                currentCarts.put(newCart.order_id,newCart);
+            }
+            return  newCart;
+        } catch (Exception sqle) {
+            System.out.println("Exception addNewBook: " + sqle);
+        }
+        return null;
+    }
+    public void addTo(ShoppingCart cart){
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        while(true){
+            BookStore.searchBook();
+            cart.addToCart();
+            int input = Integer.parseInt(getInput(br, "Do you want to continue adding more books to cart (press 1 to say yes/ 0 otherwise): "));
+            if(input!=1){
+                break;
+            }
+        }
+        int inputTwo = Integer.parseInt(getInput(br, "Do buyAll press 1 / Do edit cart press 2 / Any other number to exit!"));
+        if(inputTwo==1){
+            cart.buyCart();
+        }else if(inputTwo == 2){
+            cart.editItems();
+        }
+    }
+
+
+    public void addToExCart(){
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        DisplayExistingCarts();
+        String order_id = getInput(br,"Enter order id for which you want to add elements too :");
+        if(order_id.contains(order_id)){
+            try (
+                    Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                    Statement statement = connection.createStatement()
+            ) {
+                String query ="select * from public.shopping_cart where public.shopping_cart.order_id = '"+order_id+"'";
+                ResultSet crt = statement.executeQuery(query);
+                while(crt.next()){
+                    ShoppingCart cart = new ShoppingCart(this.user_id,crt.getString("order_id"));
+                    addTo(cart);
+                    currentCarts.put(cart.order_id,cart);
+                }
+
+            } catch (Exception sqle) {
+                System.out.println("Exception 1: " + sqle);
+            }
+        }
+    }
+
+    private void DisplayExistingCarts() {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query ="select * from ShoppingCartsList('"+this.user_id+"')";
+            ResultSet usr = statement.executeQuery(query);
+            if(!usr.next()){
+                System.out.println("No existing carts available");
+                return;
+            }
+            System.out.println("========================================= Y O U R == C A R T S =========================================");
+            while(usr.next()){
+                System.out.println("============================================================================================================");
+                System.out.println("\uD83D\uDCF2Order ID       : "+usr.getString("order_id"));
+                System.out.println("\uD83D\uDCF2Address Name   : "+usr.getString("address_name"));
+                System.out.println("\uD83D\uDCF2City           : "+usr.getString("city"));
+                System.out.println("\uD83D\uDCF2State          : "+usr.getString("state"));
+                System.out.println("\uD83D\uDCF2Zip            : "+usr.getString("zip"));
+                System.out.println("============================================================================================================\n\n");
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+
+    public void viewShipments(){
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query ="select * from ShoppingCartsList('"+this.user_id+"') as tb";
+            ResultSet usr = statement.executeQuery(query);
+            if(!usr.next()){
+                System.out.println("No shipments exist");
+                return;
+            }
+            System.out.println("========================================= Y O U R == S H I P M E N T S =========================================");
+            while(usr.next()){
+                System.out.println("============================================================================================================\n");
+                System.out.println("\uD83C\uDF89Order ID                 : "+usr.getString("tb.order_id"));
+                System.out.println("\uD83C\uDF89Address Name             : "+usr.getString("tb.address_name"));
+                System.out.println("\uD83C\uDF89City                     : "+usr.getString("tb.city"));
+                System.out.println("\uD83C\uDF89State                    : "+usr.getString("tb.state"));
+                System.out.println("\uD83C\uDF89Zip                      : "+usr.getString("tb.zip"));
+                System.out.println("\uD83C\uDF89Shipment placement date  : "+usr.getDate("tb.shipment_placement_date"));
+                System.out.println("============================================================================================================\n\n");
+
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+
+    private void cancelOrders() {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String order_id = getIDinput(br,"Enter Order ID : ");
+        try (
+            Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
+        ) {
+            String query = "delete from public.shopping_cart where public.shopping_cart.order_id = '"+order_id+"');";
+            PreparedStatement can = connection.prepareStatement(query);
+            can.execute();
+            can.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception addNewBook: " + sqle);
+        }
+    }
+
+    public void checkShipments(){
+        boolean flag = true;
+        Scanner usrin = new Scanner(System.in);
+        while(flag){
+            ShipmentMenu();
+            System.out.print("\u001b[33mInsert a Single Number and Press enter/ return :");
+            int option = usrin.nextInt();
+            System.out.println("You have entered " + option);
+            switch(option){
+                case 1: addNewCart();System.out.println("\uD83D\uDC4B Back to menu");break;
+                case 2: addToExCart();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 3: viewShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 4: cancelOrders();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 5: flag = false; System.out.println("\uD83D\uDC4B Goodbye User"); break;
+                default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
+            }
+        }
+    }
+
+
 
 
 }

@@ -154,4 +154,24 @@ public class inputFunctions {
 
     }
 
+    public static boolean foundItem(String id, String columnname, String tablename){
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            ResultSet set = statement.executeQuery("select "+columnname+" from public."+tablename+" where "+columnname+" = '"+id+"'");
+            if (!set.next()) {
+                System.out.println("No such"+id+"exisits in "+tablename);
+                statement.close();connection.close();
+                return false;
+            }else{
+                statement.close();connection.close();
+                return true;
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception foundItem: " + sqle);
+            return false;
+        }
+    }
+
 }

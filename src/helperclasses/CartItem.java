@@ -3,9 +3,9 @@ package helperclasses;
 import java.util.Date;
 
 public class CartItem {
-        int item_id;
-        String ISBN;
-        int quantity;
+        public int item_id;
+        public String ISBN;
+        public int quantity;
         Date date_of_purchase;
         public CartItem(){
                 item_id = 0;

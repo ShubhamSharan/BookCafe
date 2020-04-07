@@ -19,6 +19,15 @@ public class menus {
 
     }
 
+    public static void ShipmentMenu(){
+        System.out.println("\u001b[34m------------- Menu -------------");
+        System.out.println("\uD83D\uDCD6 Add New Cart - Press 1 ");
+        System.out.println("\uD83D\uDCD6 Fill Previous Cart - Press 2");
+        System.out.println("\uD83D\uDCD6 View Shipments - Press 3");
+        System.out.println("\uD83D\uDCD6 Cancel Shipment - Press 4");
+        System.out.println("\uD83D\uDCD6 Exit - Press 5");
+    }
+
     public static void AdministratorView(){
         System.out.println("\u001b[34m------------- Menu -------------");
         System.out.println("\uD83D\uDCD6 Search for a book press 1");
