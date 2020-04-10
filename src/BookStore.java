@@ -231,7 +231,7 @@ public class BookStore {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
         ) {
-            String query = "update public.user set user_type = false where user_id = '1000000004'";
+            String query = String.format("update public.user set user_type = false where user_id = '1000000004'");
             PreparedStatement pubsr = connection.prepareStatement(query);
             pubsr.execute();
         } catch (Exception sqle) {
