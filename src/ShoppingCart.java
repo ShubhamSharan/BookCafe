@@ -87,10 +87,7 @@ public class ShoppingCart {
         System.out.println("All items ===============================================================");
         float sum = 0;
         for(CartItem item : cartItems.values()){
-            System.out.println("BookName : "+item.item_id);
-            System.out.println("ISBN     : "+item.ISBN);
-            System.out.println("Quantity : "+item.quantity);
-
+            BookStore.search(1,item.ISBN);
             try (
                     Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                     Statement statement = connection.createStatement()
@@ -98,8 +95,7 @@ public class ShoppingCart {
                 String query ="select public.book.unit_price from public.book where public.book.isbn = '"+item.ISBN+"'";
                 ResultSet crt = statement.executeQuery(query);
                 while(crt.next()){
-                    System.out.println("UnitPrice : "+crt.getString("unit_price"));
-                    sum  = sum + Float.parseFloat(crt.getString("unit_price"));
+                    sum  = sum + Float.parseFloat(crt.getString("unit_price"))*item.quantity;
                 }
                 crt.close();
             } catch (Exception sqle) {
@@ -113,18 +109,18 @@ public class ShoppingCart {
     public void editItems(){
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         do {
-            int in = Integer.parseInt(getInput(br, "1 <- remove | 2 <- edit quantity | 3 <- Exit"));
+            int in = Integer.parseInt(getInput(br, "1 <- remove | 2 <- edit quantity | 3 <- Exit : "));
             switch (in) {
                 case 1:
                     removeItem();
                 case 2:
                     editQuantity();
                 case 3:
-                    System.out.println("Changes Saved -- Till next time___________________________");
-                    break;
+                    System.out.println("Changes Saved___________________________");
+                    return;
                 default:
                     System.out.println("Changes Saved -- Force Exited_____________________________");
-                    break;
+                    return;
             }
         } while (true);
     }

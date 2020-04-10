@@ -106,7 +106,7 @@ public class User {
             String query ="select * from UserDets('')";
             ResultSet usr = statement.executeQuery(query);
             if(!usr.next()){
-                System.out.println("No existing carts available");
+                System.out.println("No users exist");
                 return;
             }
             System.out.println("================================================== U S E R S ===================================================");
@@ -170,7 +170,7 @@ public class User {
             String query ="select * from UserDets('"+this.user_id+"')";
             ResultSet usr = statement.executeQuery(query);
             if(!usr.next()){
-                System.out.println("No existing carts available");
+                System.out.println("Unknown error");
                 return;
             }
             System.out.println("========================================= Y O U R == P R O F I L E =========================================");
@@ -267,20 +267,21 @@ public class User {
     public void addToExCart(){
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         DisplayExistingCarts();
-        String order_id = getInput(br,"Enter order id for which you want to add elements too :");
+        String order_id = getIDinput(br,"Enter order id for which you want to add elements too :");
         if(order_id.contains(order_id)){
             try (
                     Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                     Statement statement = connection.createStatement()
             ) {
-                String query ="select * from public.shopping_cart where public.shopping_cart.order_id = '"+order_id+"'";
+                String query ="select * from ShoppingCartsList('"+this.user_id+"') where order_id = '"+order_id+"'";
                 ResultSet crt = statement.executeQuery(query);
                 while(crt.next()){
                     ShoppingCart cart = new ShoppingCart(this.user_id,crt.getString("order_id"));
+                    cart.shipment_address = new Address(crt.getString("address_name"),crt.getString("city"),crt.getString("state"),crt.getString("zip"));
                     addTo(cart);
                     currentCarts.put(cart.order_id,cart);
+                    cart.displayItems();
                 }
-
             } catch (Exception sqle) {
                 System.out.println("Exception 1: " + sqle);
             }
@@ -297,8 +298,7 @@ public class User {
             ResultSet usr = statement.executeQuery(query);
             if(!usr.next()){
                 System.out.println("No existing carts available");
-                return;
-            }
+            }else{
             System.out.println("========================================= Y O U R == C A R T S =========================================");
             do{
                 System.out.println("============================================================================================================");
@@ -308,7 +308,7 @@ public class User {
                 System.out.println("\uD83D\uDCF2State          : "+usr.getString("state"));
                 System.out.println("\uD83D\uDCF2Zip            : "+usr.getString("zip"));
                 System.out.println("============================================================================================================\n\n");
-            }while(usr.next());
+            }while(usr.next());}
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
         }
@@ -372,13 +372,14 @@ public class User {
                 case 2: addToExCart();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 3: viewShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 4: cancelOrders();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 5: exitProtocol(); flag = false; System.out.println("\uD83D\uDC4B Goodbye User"); break;
+                case 5: exitProtocol(); flag = false; System.out.println("\u001B[33m \uD83D\uDC4B Goodbye User"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
         }
     }
 
     public void exitProtocol(){
+        System.out.println("CARTS INSIDE : "+currentCarts.size());
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         HashMap<String, ShoppingCart> temp = currentCarts;
         for(ShoppingCart item : temp.values()){
@@ -391,7 +392,7 @@ public class User {
                 if(usr.next()){
                     temp.remove(item.order_id);
                 }else{
-                    System.out.println("\\u001B[31m You still have items in "+item.order_id+" that you have not purchased!");
+                    System.out.println("\u001B[31m You still have items in "+item.order_id+" that you have not purchased!");
                     int option = Integer.parseInt(getInput(br,"Press 1 - Buy | Any Other Number to Ignore "));
                     if(option==1){
                         currentCarts.get(item.order_id).buyCart();
