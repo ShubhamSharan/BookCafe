@@ -110,7 +110,7 @@ public class User {
                 return;
             }
             System.out.println("================================================== U S E R S ===================================================");
-            while(usr.next()){
+            do{
                 System.out.println("============================================================================================================");
                 System.out.println("\uD83D\uDCF8User ID           : "+usr.getString("user_id"));
                 System.out.println("\uD83D\uDCF8First Name        : "+usr.getString("first_name"));
@@ -119,7 +119,7 @@ public class User {
                 System.out.println("\uD83D\uDCF8Email             : "+usr.getString("email"));
                 System.out.println("\uD83D\uDCF8Address           : "+usr.getString("address"));
                 System.out.println("============================================================================================================\n\n");
-            }
+            }while(usr.next());
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
         }
@@ -174,7 +174,7 @@ public class User {
                 return;
             }
             System.out.println("========================================= Y O U R == P R O F I L E =========================================");
-            while(usr.next()){
+            do{
                 System.out.println("============================================================================================================");
                 System.out.println("User ID           : "+usr.getString("user_id"));
                 System.out.println("First Name        : "+usr.getString("first_name"));
@@ -183,11 +183,29 @@ public class User {
                 System.out.println("Email             : "+usr.getString("email"));
                 System.out.println("Address           : "+usr.getString("address"));
                 System.out.println("============================================================================================================\n");
-
+            }while(usr.next());
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+    private Address fetchAddress(){
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query = String.format("select (public.user.address).address_name as an,(public.user.address).city as ct,(public.user.address).state as st, (public.user.address).zip as zip from public.user where public.user.user_id = '%s'", this.user_id);
+            System.out.println(query);
+            ResultSet usr = statement.executeQuery(query);
+            if(!usr.next()){
+                System.out.println("This user doesn't exist");
+            }
+            else{
+                return new Address(usr.getString("an"),usr.getString("ct"),usr.getString("st"),usr.getString("zip"));
             }
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
         }
+        return null;
     }
 
     public ShoppingCart addNewCart(){
@@ -196,17 +214,21 @@ public class User {
         int address = Integer.parseInt(getInput(br,"Press 1 to use registered address info and 0 for new address info: "));
         ShoppingCart newCart = new ShoppingCart(this.user_id,iDGen(ordersuids));
         if(address==1){
-            newCart.shipement_address = this.address;
+            newCart.shipment_address = this.fetchAddress();
+            assert newCart.shipment_address != null;
+            System.out.println("This order will be shipped too "+newCart.shipment_address.address_name+", "+newCart.shipment_address.city+", "+newCart.shipment_address.state+", "+newCart.shipment_address.zip);
+
         }else{
-            newCart.shipement_address = makeAddress();
+            newCart.shipment_address = makeAddress();
+            System.out.println("This order will be shipped too "+newCart.shipment_address.address_name+", "+newCart.shipment_address.city+", "+newCart.shipment_address.state+", "+newCart.shipment_address.zip);
         }
         try (
             Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
         ) {
-            String query = "insert into public.user " + "(oder_id,user_id,shipement_address)"
+            String query = "insert into public.shopping_cart " + "(order_id,user_id,shipment_address)"
                     +
                     " values " +
-                    "( '"+ newCart.order_id+"','"+newCart.user_id+"', ROW('"+newCart.shipement_address.address_name+"','"+newCart.shipement_address.city+"','"+newCart.shipement_address.state+"','"+newCart.shipement_address.zip+"') )";
+                    "( '"+ newCart.order_id+"','"+newCart.user_id+"', ROW('"+newCart.shipment_address.address_name+"','"+newCart.shipment_address.city+"','"+newCart.shipment_address.state+"','"+newCart.shipment_address.zip+"') )";
             System.out.println(query);
             PreparedStatement newcart = connection.prepareStatement(query);
             newcart.execute();
@@ -236,6 +258,7 @@ public class User {
         if(inputTwo==1){
             cart.buyCart();
         }else if(inputTwo == 2){
+            cart.displayItems();
             cart.editItems();
         }
     }
@@ -261,6 +284,7 @@ public class User {
             } catch (Exception sqle) {
                 System.out.println("Exception 1: " + sqle);
             }
+        }else{System.out.println("Order ID doesn't exist!!!");
         }
     }
 
@@ -276,7 +300,7 @@ public class User {
                 return;
             }
             System.out.println("========================================= Y O U R == C A R T S =========================================");
-            while(usr.next()){
+            do{
                 System.out.println("============================================================================================================");
                 System.out.println("\uD83D\uDCF2Order ID       : "+usr.getString("order_id"));
                 System.out.println("\uD83D\uDCF2Address Name   : "+usr.getString("address_name"));
@@ -284,7 +308,7 @@ public class User {
                 System.out.println("\uD83D\uDCF2State          : "+usr.getString("state"));
                 System.out.println("\uD83D\uDCF2Zip            : "+usr.getString("zip"));
                 System.out.println("============================================================================================================\n\n");
-            }
+            }while(usr.next());
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
         }
@@ -295,24 +319,26 @@ public class User {
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
         ) {
-            String query ="select * from ShoppingCartsList('"+this.user_id+"') as tb";
+            String query ="select * from Shipment('"+this.user_id+"')";
             ResultSet usr = statement.executeQuery(query);
-            if(!usr.next()){
-                System.out.println("No shipments exist");
-                return;
-            }
-            System.out.println("========================================= Y O U R == S H I P M E N T S =========================================");
-            while(usr.next()){
-                System.out.println("============================================================================================================\n");
-                System.out.println("\uD83C\uDF89Order ID                 : "+usr.getString("tb.order_id"));
-                System.out.println("\uD83C\uDF89Address Name             : "+usr.getString("tb.address_name"));
-                System.out.println("\uD83C\uDF89City                     : "+usr.getString("tb.city"));
-                System.out.println("\uD83C\uDF89State                    : "+usr.getString("tb.state"));
-                System.out.println("\uD83C\uDF89Zip                      : "+usr.getString("tb.zip"));
-                System.out.println("\uD83C\uDF89Shipment placement date  : "+usr.getDate("tb.shipment_placement_date"));
-                System.out.println("============================================================================================================\n\n");
+                if(!usr.next()){
+                    System.out.println("No shipments exist for :"+user_id);
+                }
+                else{
+                    System.out.println("========================================= Y O U R == S H I P M E N T S =========================================");
+                    do{
+                        System.out.println("============================================================================================================\n");
+                        System.out.println("\uD83C\uDF89Order ID                 : "+usr.getString("orderId"));
+                        System.out.println("\uD83C\uDF89Address Name             : "+usr.getString("addressName"));
+                        System.out.println("\uD83C\uDF89City                     : "+usr.getString("city"));
+                        System.out.println("\uD83C\uDF89State                    : "+usr.getString("state"));
+                        System.out.println("\uD83C\uDF89Zip                      : "+usr.getString("zip"));
+                        System.out.println("\uD83C\uDF89Shipment placement date  : "+usr.getDate("shipmentPlacementDate"));
+                        System.out.println("============================================================================================================\n\n");
+                    }while(usr.next());
+                }
 
-            }
+
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
         }
@@ -346,8 +372,36 @@ public class User {
                 case 2: addToExCart();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 3: viewShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 4: cancelOrders();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 5: flag = false; System.out.println("\uD83D\uDC4B Goodbye User"); break;
+                case 5: exitProtocol(); flag = false; System.out.println("\uD83D\uDC4B Goodbye User"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
+            }
+        }
+    }
+
+    public void exitProtocol(){
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        HashMap<String, ShoppingCart> temp = currentCarts;
+        for(ShoppingCart item : temp.values()){
+            try (
+                    Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                    Statement statement = connection.createStatement()
+            ) {
+                String query ="select * from Shipment('"+this.user_id+"') where orderId = '"+item.order_id+"'" ;
+                ResultSet usr = statement.executeQuery(query);
+                if(usr.next()){
+                    temp.remove(item.order_id);
+                }else{
+                    System.out.println("\\u001B[31m You still have items in "+item.order_id+" that you have not purchased!");
+                    int option = Integer.parseInt(getInput(br,"Press 1 - Buy | Any Other Number to Ignore "));
+                    if(option==1){
+                        currentCarts.get(item.order_id).buyCart();
+                    }else{
+                        temp.remove(item.order_id);
+                    }
+                }
+                usr.close();
+            } catch (Exception sqle) {
+                System.out.println("Exception 1: " + sqle);
             }
         }
     }

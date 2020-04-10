@@ -15,7 +15,7 @@ CREATE FUNCTION SearchByAtomic(val varchar(400), col_nam varchar(400))
 		DECLARE
 		BEGIN
 		RETURN QUERY EXECUTE format('
-			select book.isbn,book.quantity,book.book_name,book.number_of_pages,book.unit_price,book.date_of_publish,stateas "publisher_name", string_agg(DISTINCT public.author.author_name, '', '') as authors,string_agg(DISTINCT public.genre.genre, '', '') as genres
+			select book.isbn,book.quantity,book.book_name,book.number_of_pages,book.unit_price,book.date_of_publish,CONCAT((public.publisher.name).first_name,'' '',(public.publisher.name).last_name) as "publisher_name", string_agg(DISTINCT public.author.author_name, '', '') as authors,string_agg(DISTINCT public.genre.genre, '', '') as genres
 			from
 			((public.book inner join public.author on public.author.isbn = public.book.isbn) inner join public.publisher on public.publisher.publisher_id = public.book.publisher_id) inner join public.genre on public.genre.isbn = public.book.isbn
 			where
@@ -23,6 +23,8 @@ CREATE FUNCTION SearchByAtomic(val varchar(400), col_nam varchar(400))
 			group by book.isbn,public.publisher.publisher_id',col_nam,val);
 		END;
 $$ LANGUAGE plpgsql;
+
+select * from SearchByAtomic('a','book.isbn');
 
 
 CREATE OR REPLACE FUNCTION ShoppingCartsList(user_id varchar(10))

@@ -103,7 +103,7 @@ CREATE TABLE public.shopping_cart
     order_id varchar(10) not null,
 	user_id varchar(10) not null,
 	shipment_address addressType,
-	shipement_placement_date date,
+	shipment_placement_date date,
     primary key (order_id),
 	foreign key (user_id) references public.user on delete cascade
 );
