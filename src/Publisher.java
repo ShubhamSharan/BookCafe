@@ -126,4 +126,72 @@ public class Publisher {
 
     }
 
+    public void checkProfile(){
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query ="select * from PubDets('"+this.publisher_id+"')";
+            ResultSet pb = statement.executeQuery(query);
+            if(!pb.next()){
+                System.out.println("Unknown error");
+                return;
+            }
+            System.out.println("========================================= Y O U R == P R O F I L E =========================================");
+            do{
+                System.out.println("============================================================================================================");
+                System.out.println("User ID           : "+pb.getString("publisher_id"));
+                System.out.println("First Name        : "+pb.getString("first_name"));
+                System.out.println("Middle Name       : "+pb.getString("middle_name"));
+                System.out.println("Last Name         : "+pb.getString("last_name"));
+                System.out.println("Email             : "+pb.getString("email"));
+                System.out.println("Address           : "+pb.getString("address"));
+                System.out.println("============================================================================================================\n");
+            }while(pb.next());
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+
+    public void checkRequests() {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query ="select * from public.book where public.book.publisher_id ='"+this.publisher_id+"' and public.book.request_approved = FALSE";
+            ResultSet req = statement.executeQuery(query);
+            while (req.next()){
+                BookStore.search(1,req.getString("isbn"));
+                int validate = Integer.parseInt(getInput(br,"1 <- Approve | Any other number <- NotApprove"));
+                if(validate==1){
+                    updateBook(req.getString("isbn"),true);
+                }else{
+                    updateBook(req.getString("isbn"),false);
+                }
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+
+    private void updateBook(String isbn, Boolean check) {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","")
+        ) {
+            String query;
+            if(check){
+                query = "update public.book set public.book.request_approved = TRUE, public.book.last_request_date = Now()";
+            }
+            else{
+                query = "update public.book set public.book.last_request_date = Now()";
+            }
+            PreparedStatement purchase = connection.prepareStatement(query);
+            purchase.execute();
+            purchase.close();
+        } catch (Exception sqle) {
+            System.out.println(" Exception updatebook: " + sqle);
+        }
+
+    }
 }

@@ -103,6 +103,30 @@ CREATE OR REPLACE FUNCTION userDets(userid varchar(10))
 $$ LANGUAGE plpgsql;
 select * from userDets('')
 
+CREATE OR REPLACE FUNCTION pubDets(idval varchar(10))
+	RETURNS TABLE(
+		publisher_id varchar(10),
+		first_name varchar(255),
+		middle_name varchar(255),
+		last_name varchar(255),
+		email varchar(255),
+		address text
+	)
+	AS $$
+		DECLARE
+		BEGIN
+		RETURN QUERY
+			select
+			public.publisher.publisher_id as publisher_id,
+			(public.publisher.name).first_name as first_name,
+			(public.publisher.name).middle_name as middle_name,
+			(public.publisher.name).last_name as last_name,
+			public.publisher.email as email,
+			CONCAT((public.publisher.address).address_name,', ',(public.publisher.address).city,', ',(public.publisher.address).state,', ',(public.publisher.address).zip) as address
+			from public.publisher
+			where public.publisher.publisher_id ~ pubDets.idval;
+		END;
+$$ LANGUAGE plpgsql;
 
 
 

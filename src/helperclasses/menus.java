@@ -44,6 +44,8 @@ public class menus {
         System.out.println("\uD83D\uDCD6 Show my books press 1 ");
         System.out.println("\uD83D\uDCD6 Check Sales Account Status press 2");
         System.out.println("\uD83D\uDCD6 Check profile details 3");
+        System.out.println("\uD83D\uDCD6 Check Book Reorder Requests press 4 ");
+        System.out.println("\uD83D\uDCD6 Exit Press 5");
     }
 
     public static void SearchMenu(){

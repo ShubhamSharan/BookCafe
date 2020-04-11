@@ -33,7 +33,7 @@ public class BookStore {
         search_types.put(2,"book.book_name");
         search_types.put(3,"author.author_name");
         search_types.put(4,"genre.genre");
-        search_types.put(5,"publisher_id");
+        search_types.put(5,"publisher.publisher_id");
     }
     public void addSearchTitles(){
         search_titles.put(1," Book ISBN ");
@@ -124,15 +124,16 @@ public class BookStore {
             System.out.println("You have entered " + option);
             switch(option){
                 case 1: search(5,expub.publisher_id);System.out.println("\uD83D\uDC4B Back to menu");break;
-                case 2: expub.viewMyBooks();System.out.println("\uD83D\uDC4B Back to menu");break;
-                case 3: expub.checkSales();System.out.println("\uD83D\uDC4B Back to menu");break;
-                case 4: flag = false; System.out.println("\uD83D\uDC4B Goodbye Publisher - Logged Out"); break;
+                case 2: expub.checkSales();System.out.println("\uD83D\uDC4B Back to menu");break;
+                case 3: expub.checkProfile();System.out.println("\uD83D\uDC4B Back to menu");break;
+                case 4: expub.checkRequests();System.out.println("\uD83D\uDC4B Back to menu");break;
+                case 5: flag = false; System.out.println("\uD83D\uDC4B Goodbye Publisher - Logged Out"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
         }
 
     }
-//2/2/2022
+
     public void NewUser() {
         String id = iDGen(this.uids);
         User newuser = User.NewUsr(id);
@@ -186,7 +187,6 @@ public class BookStore {
                 Statement statement = connection.createStatement()
         ) {
             String query = "select * from SearchByAtomic('"+input+"','"+search_types.get(option)+"');";
-            System.out.println(query);
             ResultSet result = statement.executeQuery(query);
             System.out.println("=============================================== Your Books Are ================================================\n");
             while(result.next()){
@@ -231,9 +231,15 @@ public class BookStore {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
         ) {
-            String query = String.format("update public.user set user_type = false where user_id = '1000000004'");
-            PreparedStatement pubsr = connection.prepareStatement(query);
-            pubsr.execute();
+            Statement statement = connection.createStatement();
+            String query = "select * from public.user where public.user.user_type = false";
+            ResultSet result = statement.executeQuery(query);
+            if(!result.next()){
+                String qry = "update public.user set user_type = false where user_id = '1000000004'";
+                PreparedStatement pubsr = connection.prepareStatement(qry);
+                pubsr.execute();
+            }
+
         } catch (Exception sqle) {
             System.out.println("Exception Pub SQL: " + sqle);
         }

@@ -3,6 +3,7 @@ import java.util.Scanner;
 import static helperclasses.menus.*;
 
 public class Homepage {
+    //select * from public.publisher where publisher_id = '1000107187'
     public static void main(String [] args){
         System.out.println("\u001b[35mWELCOME TO THE BOOK CAFE \uD83D\uDCDA \uD83E\uDD13");
         BookStore bookcafe = new BookStore("bookcafe"); //right now the db is empty
