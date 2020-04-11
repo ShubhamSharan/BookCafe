@@ -48,6 +48,14 @@ public class menus {
         System.out.println("\uD83D\uDCD6 Exit Press 5");
     }
 
+    public static void Sales(){
+        System.out.println("\u001b[34m------------- Menu -------------");
+        System.out.println("\uD83D\uDCD6 Copies sold by genre 1 ");
+        System.out.println("\uD83D\uDCD6 Copies sold by author 2");
+        System.out.println("\uD83D\uDCD6 Sales by Current Month 3");
+        System.out.println("\uD83D\uDCD6 Exit Any other number to exit");
+    }
+
     public static void SearchMenu(){
         System.out.println("\u001b[34m------------- Search Book By -------------");
         System.out.println("\uD83D\uDCD6 ISBN - press 1 ");

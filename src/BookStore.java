@@ -131,7 +131,6 @@ public class BookStore {
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
         }
-
     }
 
     public void NewUser() {
@@ -176,9 +175,107 @@ public class BookStore {
             System.out.println("Exception Pub SQL: " + sqle);
         }
     }
-    //Functions
-    public void showReports(){
 
+    public void showReports(){
+        BufferedReader br =  new BufferedReader(new InputStreamReader(System.in));
+        Sales();
+        int option = Integer.parseInt(getInput(br,"Your Selection : "));
+        switch (option){
+            case 1: genreSales();break;
+            case 2: authorSales();break;
+            case 3: salesCurrentMonth();break;
+            default:System.out.println("Thank you for visiting!");break;
+        }
+    }
+
+    private void authorSales() {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String refquery = "REFRESH MATERIALIZED VIEW CopiesSoldByAuthor";
+            PreparedStatement qry = connection.prepareStatement(refquery);
+            qry.execute();
+            qry.close();
+            String query ="select * from CopiesSoldByAuthor";
+            ResultSet crt = statement.executeQuery(query);
+            if(!crt.next()){
+                System.out.println("No Reports Available");
+                return;
+            }
+            System.out.println("============================================ A U T H O R  S A L E S ============================================");
+            do{
+                System.out.println("============================================================================================================");
+                System.out.println("Author Name         : "+crt.getString("author_name"));
+                System.out.println("Copies Sold         : "+crt.getString("copies"));
+                System.out.println("Sales               : "+crt.getString("sales"));
+                System.out.println("============================================================================================================\n");
+            }while(crt.next());
+            crt.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+
+    }
+
+    private void salesCurrentMonth() {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String refquery = "REFRESH MATERIALIZED VIEW SalesByMonth";
+            PreparedStatement qry = connection.prepareStatement(refquery);
+            qry.execute();
+            qry.close();
+            String query ="select * from CopiesSoldByGenre";
+            ResultSet crt = statement.executeQuery(query);
+            if(!crt.next()){
+                System.out.println("No Reports Available");
+                return;
+            }
+            System.out.println("============================================= T H I S   M O N T H S   S A L E S =============================================");
+            do{
+                System.out.println("============================================================================================================");
+                System.out.println("ISBN                : "+crt.getString("isbn"));
+                System.out.println("Book name           : "+crt.getString("book_name"));
+                System.out.println("Copies Sold         : "+crt.getString("copies_sold"));
+                System.out.println("Sales               : "+crt.getString("sales"));
+                System.out.println("============================================================================================================\n");
+            }while(crt.next());
+            crt.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+
+    }
+
+    private void genreSales() {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String refquery = "REFRESH MATERIALIZED VIEW CopiesSoldByGenre";
+            PreparedStatement qry = connection.prepareStatement(refquery);
+            qry.execute();
+            qry.close();
+            String query ="select * from CopiesSoldByGenre";
+            ResultSet crt = statement.executeQuery(query);
+            if(!crt.next()){
+                System.out.println("No Reports Available");
+                return;
+            }
+            System.out.println("============================================= G E N R E  S A L E S =============================================");
+            do{
+                System.out.println("============================================================================================================");
+                System.out.println("Genre Name          : "+crt.getString("genre"));
+                System.out.println("Copies Sold         : "+crt.getString("copies"));
+                System.out.println("Sales               : "+crt.getString("sales"));
+                System.out.println("============================================================================================================\n");
+            }while(crt.next());
+            crt.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
     }
 
     public static void search(int option, String input){
