@@ -2,10 +2,8 @@ import helperclasses.Address;
 import helperclasses.CartItem;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -27,10 +25,6 @@ public class ShoppingCart {
         shipment_address = null;
         shipment_status = "Inititiated";
         shipment_placement_date = new Date();
-    }
-
-    public static void printShipments() {
-
     }
 
     public void addToCart() {

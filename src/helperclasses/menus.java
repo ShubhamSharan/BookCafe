@@ -12,11 +12,10 @@ public class menus {
     }
     public static void ExUserView(){
         System.out.println("\u001b[34m------------- Menu -------------");
-        System.out.println("\uD83D\uDCD6 Search for a book - Press 1 ");
-        System.out.println("\uD83D\uDCD6 Check your orders - Press 2");
-        System.out.println("\uD83D\uDCD6 Check profile details - Press 3");
-        System.out.println("\uD83D\uDCD6 Exit - Press 4");
-
+        System.out.println("\uD83D\uDCD6 Search for a book              - Press 1 ");
+        System.out.println("\uD83D\uDCD6 Add to cart/ Check your orders - Press 2");
+        System.out.println("\uD83D\uDCD6 Check profile details          - Press 3");
+        System.out.println("\uD83D\uDCD6 Exit                           - Press 4");
     }
 
     public static void ShipmentMenu(){
@@ -37,7 +36,6 @@ public class menus {
         System.out.println("\uD83D\uDC4D Track shipments press 5");
         System.out.println("\uD83D\uDC4D To show reports press 6");
         System.out.println("\uD83D\uDC4D Exit mode press 7");
-
     }
     public static void ExPublisherView(){
         System.out.println("\u001b[34m------------- Menu -------------");
@@ -61,7 +59,7 @@ public class menus {
         System.out.println("\uD83D\uDCD6 ISBN - press 1 ");
         System.out.println("\uD83D\uDCD6 Book name - press 2");
         System.out.println("\uD83D\uDCD6 Author Name - press 3");
-        System.out.println("\uD83D\uDCD6 Genre - press 4"); //different table
+        System.out.println("\uD83D\uDCD6 Genre - press 4");
         System.out.println("\uD83D\uDCD6 Exit - press 5");
     }
 }

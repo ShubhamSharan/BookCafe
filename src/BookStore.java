@@ -15,8 +15,6 @@ public class BookStore {
     HashSet<String> uids; //For publisher and users
     public static HashMap<Integer,String> search_titles = new HashMap<>();
     public static HashMap<Integer,String> search_types = new HashMap<>();
-
-
     //No Data iun DB
     public BookStore(String bsn){
         book_store_name = bsn;
@@ -67,15 +65,13 @@ public class BookStore {
                 case 2: Book.addNewBook(); System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 3: Book.removeBook(); System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 4: User.printUsers();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 5: ShoppingCart.printShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
+                case 5: User.showAllShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 6: showReports();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 7: flag = false; System.out.println("\uD83D\uDC4B Goodbye Admin"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
         }
     }
-
-
 
     public void ExUser(){
         Scanner usrin = new Scanner(System.in);
@@ -146,7 +142,7 @@ public class BookStore {
                     +
                     " values " +
                     "( '"+ newuser.user_id+"',TRUE,ROW('"+newuser.first_name+"','"+newuser.middle_name+"','"+newuser.second_name+"'),'"+newuser.getEmail()+"','"+newuser.getPassword()+"',ROW ('"+newuser.getAccount().account_name+"',"+newuser.getAccount().account_number+",'"+sqlDate+"'),ROW('"+newuser.getAddress().address_name+"','"+newuser.getAddress().city+"','"+newuser.getAddress().state+"','"+newuser.getAddress().zip+"') )";
-            System.out.println(query);
+//            System.out.println(query);
             PreparedStatement usr = connection.prepareStatement(query);
             usr.execute();
             uids.add(id);
@@ -167,7 +163,6 @@ public class BookStore {
                     +
                     " values " +
                     "( '"+ newpub.publisher_id+"',ROW('"+newpub.first_name+"','"+newpub.middle_name+"','"+newpub.second_name+"'),'"+newpub.getEmail()+"','"+newpub.getPassword()+"', ROW('"+newpub.getAddress().address_name+"','"+newpub.getAddress().city+"','"+newpub.getAddress().state+"','"+newpub.getAddress().zip+ "') ,ROW ('"+newpub.getAccount().account_name+"',"+newpub.getAccount().account_number+",'"+sqlDate+"'))";
-            System.out.println(query);
             PreparedStatement pubsr = connection.prepareStatement(query);
             pubsr.execute();
             uids.add(id);
@@ -227,7 +222,7 @@ public class BookStore {
             PreparedStatement qry = connection.prepareStatement(refquery);
             qry.execute();
             qry.close();
-            String query ="select * from CopiesSoldByGenre";
+            String query ="select * from SalesByMonth";
             ResultSet crt = statement.executeQuery(query);
             if(!crt.next()){
                 System.out.println("No Reports Available");

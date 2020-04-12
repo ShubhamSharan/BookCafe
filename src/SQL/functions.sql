@@ -68,9 +68,9 @@ CREATE OR REPLACE FUNCTION Shipment(user_id varchar(10))
 			(public.shopping_cart.shipment_address).city as city,
 			(public.shopping_cart.shipment_address).state as state,
 			(public.shopping_cart.shipment_address).zip as zip,
-			public.shopping_cart.shipement_placement_date as shipmentPlacementDate
+			public.shopping_cart.shipment_placement_date as shipmentPlacementDate
 			from public.shopping_cart
-			where shopping_cart.user_id = Shipment.user_id and  shopping_cart.order_id in (select public.shipment_confirmed.order_id from public.shipment_confirmed)
+			where shopping_cart.user_id ~ Shipment.user_id and  shopping_cart.order_id in (select public.shipment_confirmed.order_id from public.shipment_confirmed)
 			;
 		END;
 $$ LANGUAGE plpgsql;

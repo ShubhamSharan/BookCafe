@@ -1,5 +1,6 @@
 import helperclasses.Address;
 import helperclasses.BankingAccount;
+import helperclasses.CartItem;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -194,7 +195,6 @@ public class User {
                 Statement statement = connection.createStatement()
         ) {
             String query = String.format("select (public.user.address).address_name as an,(public.user.address).city as ct,(public.user.address).state as st, (public.user.address).zip as zip from public.user where public.user.user_id = '%s'", this.user_id);
-            System.out.println(query);
             ResultSet usr = statement.executeQuery(query);
             if(!usr.next()){
                 System.out.println("This user doesn't exist");
@@ -229,7 +229,7 @@ public class User {
                     +
                     " values " +
                     "( '"+ newCart.order_id+"','"+newCart.user_id+"', ROW('"+newCart.shipment_address.address_name+"','"+newCart.shipment_address.city+"','"+newCart.shipment_address.state+"','"+newCart.shipment_address.zip+"') )";
-            System.out.println(query);
+//            System.out.println(query);
             PreparedStatement newcart = connection.prepareStatement(query);
             newcart.execute();
             newcart.close();
@@ -256,13 +256,36 @@ public class User {
         }
         int inputTwo = Integer.parseInt(getInput(br, "Do buyAll press 1 / Do edit cart press 2 / Any other number to exit!"));
         if(inputTwo==1){
+            int option = Integer.parseInt(getInput(br, "1 <- Use Current Registered Billing Info | 2 <- Enter New Billing Info : "));
+            if(option==1){
+                try (
+                        Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                        Statement statement = connection.createStatement()
+                ) {
+                    String query ="select (public.user.bank_account).account_name as ac,(public.user.bank_account).account_number as an, (public.user.bank_account).expirydate as ex from public.user where public.user.user_id = '"+user_id+"'";
+                    ResultSet crt = statement.executeQuery(query);
+                    while(crt.next()){
+                        this.account.account_number = crt.getLong("an");
+                        this.account.account_name = crt.getString("ac");
+                        this.account.expirydetail = crt.getDate("ex");
+                    }
+                } catch (Exception sqle) {
+                    System.out.println("Exception 1: " + sqle);
+                }
+                System.out.println("Using Banking Details of :"+this.getAccount().account_name);
+                System.out.println("Using Banking Details of :"+String.valueOf(this.getAccount().account_number).substring(0,6)+"***** ******");
+            }else{
+                BankingAccount account = makeAccount();
+                System.out.println("Using Banking Details of :"+account.account_name);
+                System.out.println("Using Banking Details of :"+String.valueOf(account.account_number).substring(0,6)+"***** ******");
+            }
             cart.buyCart();
+            cart.displayItems();
         }else if(inputTwo == 2){
             cart.displayItems();
             cart.editItems();
         }
     }
-
 
     public void addToExCart(){
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -280,7 +303,6 @@ public class User {
                     cart.shipment_address = new Address(crt.getString("address_name"),crt.getString("city"),crt.getString("state"),crt.getString("zip"));
                     addTo(cart);
                     currentCarts.put(cart.order_id,cart);
-                    cart.displayItems();
                 }
             } catch (Exception sqle) {
                 System.out.println("Exception 1: " + sqle);
@@ -307,6 +329,14 @@ public class User {
                 System.out.println("\uD83D\uDCF2City           : "+usr.getString("city"));
                 System.out.println("\uD83D\uDCF2State          : "+usr.getString("state"));
                 System.out.println("\uD83D\uDCF2Zip            : "+usr.getString("zip"));
+                if(currentCarts.get(usr.getString("order_id")) != null){
+                    ShoppingCart cart  = currentCarts.get(usr.getString("order_id"));
+                    for(CartItem item : cart.cartItems.values()){
+                        System.out.println("    \uD83D\uDCF2Index                : "+item.item_id);
+                        System.out.println("    \uD83D\uDCF2ISBN                 : "+item.ISBN);
+                        System.out.println("    \uD83D\uDCF2Quantity             : "+item.quantity);
+                    }
+                }
                 System.out.println("============================================================================================================\n\n");
             }while(usr.next());}
         } catch (Exception sqle) {
@@ -315,14 +345,25 @@ public class User {
     }
 
     public void viewShipments(){
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
         try (
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
         ) {
-            String query ="select * from Shipment('"+this.user_id+"')";
+            String query;
+            String extraInfo = "";
+            int view = Integer.parseInt(getInput(br,"1 <- Check all shipments | Any number <- Specific shipment : "));
+            if(view ==1){
+                query ="select * from Shipment('"+this.user_id+"')";
+            }else{
+                String orderid = getIDinput(br,"Enter Order ID : ");
+                query = "select * from Shipment('"+this.user_id+"') where orderId = '"+orderid+"'";
+                extraInfo = " and in particular this shipment with order number : "+orderid+" doesn't exist.";
+            }
             ResultSet usr = statement.executeQuery(query);
                 if(!usr.next()){
-                    System.out.println("No shipments exist for :"+user_id);
+                    System.out.println("No shipments exist for :"+user_id+extraInfo);
                 }
                 else{
                     System.out.println("========================================= Y O U R == S H I P M E N T S =========================================");
@@ -337,8 +378,6 @@ public class User {
                         System.out.println("============================================================================================================\n\n");
                     }while(usr.next());
                 }
-
-
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
         }
@@ -350,7 +389,7 @@ public class User {
         try (
             Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002")
         ) {
-            String query = "delete from public.shopping_cart where public.shopping_cart.order_id = '"+order_id+"');";
+            String query = "delete from public.shopping_cart where public.shopping_cart.order_id = '"+order_id+"';";
             PreparedStatement can = connection.prepareStatement(query);
             can.execute();
             can.close();
@@ -378,6 +417,42 @@ public class User {
         }
     }
 
+    public static void showAllShipments(){
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query;
+            int view = Integer.parseInt(getInput(br,"1 <- Check all shipments | Any number <- Specific shipment : "));
+            if(view ==1){
+                query ="select * from Shipment('')";
+            }else{
+                String orderid = getIDinput(br,"Enter Order ID : ");
+                query = "select * from Shipment('') where orderId = '"+orderid+"'";
+            }
+            ResultSet usr = statement.executeQuery(query);
+            if(!usr.next()){
+                System.out.println("No shipments exists");
+            }
+            else{
+                System.out.println("========================================= A L L == S H I P M E N T S =========================================");
+                do{
+                    System.out.println("============================================================================================================\n");
+                    System.out.println("\uD83C\uDF89Order ID                 : "+usr.getString("orderId"));
+                    System.out.println("\uD83C\uDF89Address Name             : "+usr.getString("addressName"));
+                    System.out.println("\uD83C\uDF89City                     : "+usr.getString("city"));
+                    System.out.println("\uD83C\uDF89State                    : "+usr.getString("state"));
+                    System.out.println("\uD83C\uDF89Zip                      : "+usr.getString("zip"));
+                    System.out.println("\uD83C\uDF89Shipment placement date  : "+usr.getDate("shipmentPlacementDate"));
+                    System.out.println("============================================================================================================\n\n");
+                }while(usr.next());
+            }
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+
     public void exitProtocol(){
         System.out.println("CARTS INSIDE : "+currentCarts.size());
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -395,6 +470,15 @@ public class User {
                     System.out.println("\u001B[31m You still have items in "+item.order_id+" that you have not purchased!");
                     int option = Integer.parseInt(getInput(br,"Press 1 - Buy | Any Other Number to Ignore "));
                     if(option==1){
+                        int opt = Integer.parseInt(getInput(br, "1 <- Use Current Registered Billing Info | Any Number <- Enter New Billing Info : "));
+                        if(opt==1){
+                            System.out.println("Using Banking Details of :"+this.getAccount().account_name);
+                            System.out.println("Account Number :"+String.valueOf(this.getAccount().account_number).substring(0,6)+"***** ******");
+                        }else{
+                            BankingAccount account = makeAccount();
+                            System.out.println("Using Banking Details of :"+account.account_name);
+                            System.out.println("Account Number :"+String.valueOf(account.account_number).substring(0,6)+"***** ******");
+                        }
                         currentCarts.get(item.order_id).buyCart();
                     }else{
                         temp.remove(item.order_id);
