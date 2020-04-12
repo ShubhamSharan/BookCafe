@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 import static helperclasses.Address.makeAddress;
 import static helperclasses.BankingAccount.makeAccount;
@@ -124,7 +125,6 @@ public class User {
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
         }
-
     }
 
     public static User checkUser(String type){
@@ -370,11 +370,28 @@ public class User {
                     do{
                         System.out.println("============================================================================================================\n");
                         System.out.println("\uD83C\uDF89Order ID                 : "+usr.getString("orderId"));
-                        System.out.println("\uD83C\uDF89Address Name             : "+usr.getString("addressName"));
-                        System.out.println("\uD83C\uDF89City                     : "+usr.getString("city"));
-                        System.out.println("\uD83C\uDF89State                    : "+usr.getString("state"));
-                        System.out.println("\uD83C\uDF89Zip                      : "+usr.getString("zip"));
-                        System.out.println("\uD83C\uDF89Shipment placement date  : "+usr.getDate("shipmentPlacementDate"));
+                        System.out.println("    \uD83C\uDF89Address Name             : "+usr.getString("addressName"));
+                        System.out.println("    \uD83C\uDF89City                     : "+usr.getString("city"));
+                        System.out.println("    \uD83C\uDF89State                    : "+usr.getString("state"));
+                        System.out.println("    \uD83C\uDF89Zip                      : "+usr.getString("zip"));
+                        Calendar ncal = Calendar.getInstance();
+                        ncal.setTime(usr.getDate("shipmentPlacementDate"));
+                        System.out.println("    \uD83C\uDF89Shipment placement date  : "+ncal.getTime().toString());
+                        Calendar cal = Calendar.getInstance();
+                        Date date = usr.getDate("shipmentPlacementDate");
+                        cal.setTime(date);
+                        cal.add(Calendar.DATE,2);
+                        cal.set(Calendar.HOUR, 10);
+                        cal.set(Calendar.MINUTE, 30);
+                        System.out.println("    \uD83C\uDF89Shipment Arrival date    : "+cal.getTime().toString());
+                        String ans;
+                        Calendar today = Calendar.getInstance();
+                        if(today.get(Calendar.DAY_OF_YEAR) == ncal.get(Calendar.DAY_OF_YEAR)){
+                            ans = "Order still in Store";
+                        }else if(today.get(Calendar.DAY_OF_YEAR) > cal.get(Calendar.DAY_OF_YEAR)){
+                            ans = "Delievered";
+                        }else{ans = "On the road";}
+                        System.out.println("    \uD83C\uDF89Order currently in       : "+ans);
                         System.out.println("============================================================================================================\n\n");
                     }while(usr.next());
                 }
@@ -456,8 +473,8 @@ public class User {
     public void exitProtocol(){
         System.out.println("CARTS INSIDE : "+currentCarts.size());
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        HashMap<String, ShoppingCart> temp = currentCarts;
-        for(ShoppingCart item : temp.values()){
+//        HashMap<String, ShoppingCart> temp = currentCarts;
+        for(ShoppingCart item : currentCarts.values()){
             try (
                     Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                     Statement statement = connection.createStatement()
@@ -465,7 +482,7 @@ public class User {
                 String query ="select * from Shipment('"+this.user_id+"') where orderId = '"+item.order_id+"'" ;
                 ResultSet usr = statement.executeQuery(query);
                 if(usr.next()){
-                    temp.remove(item.order_id);
+                    currentCarts.remove(item.order_id);
                 }else{
                     System.out.println("\u001B[31m You still have items in "+item.order_id+" that you have not purchased!");
                     int option = Integer.parseInt(getInput(br,"Press 1 - Buy | Any Other Number to Ignore "));
@@ -481,10 +498,13 @@ public class User {
                         }
                         currentCarts.get(item.order_id).buyCart();
                     }else{
-                        temp.remove(item.order_id);
+                        currentCarts.remove(item.order_id);
                     }
                 }
                 usr.close();
+                //Clean Up Statement
+                PreparedStatement rem = connection.prepareStatement("delete from public.shopping_cart where public.shopping_cart.shipment_placement_date = null");
+                rem.executeUpdate();
             } catch (Exception sqle) {
                 System.out.println("Exception 1: " + sqle);
             }

@@ -49,6 +49,33 @@ public class Publisher {
         account = new BankingAccount();
     }
 
+    public static void viewAll() {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String query ="select * from PubDets('')";
+            ResultSet usr = statement.executeQuery(query);
+            if(!usr.next()){
+                System.out.println("No publishers exist");
+                return;
+            }
+            System.out.println("================================================== P U B L I S H E R S ===================================================");
+            do{
+                System.out.println("============================================================================================================");
+                System.out.println("\uD83D\uDCF8Publisher ID      : "+usr.getString("publisher_id"));
+                System.out.println("\uD83D\uDCF8First Name        : "+usr.getString("first_name"));
+                System.out.println("\uD83D\uDCF8Middle Name       : "+usr.getString("middle_name"));
+                System.out.println("\uD83D\uDCF8Last Name         : "+usr.getString("last_name"));
+                System.out.println("\uD83D\uDCF8Email             : "+usr.getString("email"));
+                System.out.println("\uD83D\uDCF8Address           : "+usr.getString("address"));
+                System.out.println("============================================================================================================\n\n");
+            }while(usr.next());
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+    }
+
     public BankingAccount getAccount() {
         return account;
     }
@@ -115,15 +142,40 @@ public class Publisher {
         return null;
     }
 
-    public void searchMyBooks(){
-
-    }
     public void checkSales(){
-
-
-    }
-    public void viewMyBooks(){
-
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String refquery = "REFRESH MATERIALIZED VIEW SalesVsExpAllMonth";
+            PreparedStatement qry = connection.prepareStatement(refquery);
+            qry.execute();
+            qry.close();
+            String query ="select * from SalesVsExpAllMonth where publisher_id = '"+this.publisher_id+"'";
+            ResultSet crt = statement.executeQuery(query);
+            if(!crt.next()){
+                System.out.println("No Reports Available");
+                return;
+            }
+            System.out.println("============================================= Y E A R L Y   S A L E S =============================================");
+            float amt = 0;
+            do{
+                System.out.println("Date                      : "+crt.getString("date"));
+                System.out.println("ISBN                      : "+crt.getString("isbn"));
+                System.out.println("Percent to Publisher      : "+crt.getString("percent_to_publisher"));
+                System.out.println("Book name                 : "+crt.getString("book_name"));
+                System.out.println("Copies Sold               : "+crt.getString("copies_sold"));
+                System.out.println("Sales                     : "+crt.getString("sales"));
+                System.out.println("Publishers Cut            : "+crt.getString("publisherscut"));
+                System.out.println("Profit                     : "+crt.getString("profit"));
+                System.out.println("-------------------------------------------------------------------------------------------------------------\n");
+                amt = amt + crt.getFloat("publisherscut");
+            }while(crt.next());
+            System.out.println("This Month's Transfer = $: "+amt);
+            crt.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
     }
 
     public void checkProfile(){
@@ -161,14 +213,19 @@ public class Publisher {
         ) {
             String query ="select * from public.book where public.book.publisher_id ='"+this.publisher_id+"' and public.book.request_approved = FALSE";
             ResultSet req = statement.executeQuery(query);
-            while (req.next()){
+            if(!req.next()){
+                System.out.println("The Publisher has no refill requests.");
+            }else{
+            do{
                 BookStore.search(1,req.getString("isbn"));
-                int validate = Integer.parseInt(getInput(br,"1 <- Approve | Any other number <- NotApprove"));
+                System.out.println("ORDER REQUESTS :" + req.getString("requested_quantity"));
+                int validate = Integer.parseInt(getInput(br,"1 <- Approve | Any other number <- NotApprove : "));
                 if(validate==1){
                     updateBook(req.getString("isbn"),true);
                 }else{
                     updateBook(req.getString("isbn"),false);
                 }
+            }while (req.next());
             }
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);
@@ -181,10 +238,10 @@ public class Publisher {
         ) {
             String query;
             if(check){
-                query = "update public.book set public.book.request_approved = TRUE, public.book.last_request_date = Now()";
+                query = "update public.book set request_approved = TRUE, quantity = (quantity + requested_quantity), last_request_date = Now() where public.book.isbn = '"+isbn+"' ";
             }
             else{
-                query = "update public.book set public.book.last_request_date = Now()";
+                query = "update public.book set last_request_date = Now() where isbn = '"+isbn+"' ";
             }
             PreparedStatement purchase = connection.prepareStatement(query);
             purchase.execute();
@@ -192,6 +249,5 @@ public class Publisher {
         } catch (Exception sqle) {
             System.out.println(" Exception updatebook: " + sqle);
         }
-
     }
 }

@@ -66,7 +66,7 @@ $$
 LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS publisher_request_update on shipment_confirmed;
-CREATE TRIGGER publisher_request_update after insert
+CREATE TRIGGER publisher_request_update before insert
 on shipment_confirmed
 FOR EACH ROW
 EXECUTE PROCEDURE pubReq();

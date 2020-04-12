@@ -67,7 +67,8 @@ public class BookStore {
                 case 4: User.printUsers();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 5: User.showAllShipments();System.out.println("\uD83D\uDCDA Back to Menu");break;
                 case 6: showReports();System.out.println("\uD83D\uDCDA Back to Menu");break;
-                case 7: flag = false; System.out.println("\uD83D\uDC4B Goodbye Admin"); break;
+                case 7: Publisher.viewAll(); System.out.println("\uD83D\uDC4B Goodbye Admin"); break;
+                case 8: flag = false; System.out.println("\uD83D\uDC4B Goodbye Admin"); break;
                 default: System.out.println("\u001b[31mPlease make sure you type a number fromt the MENU followed by clicking on the enter key");
             }
         }
@@ -179,6 +180,7 @@ public class BookStore {
             case 1: genreSales();break;
             case 2: authorSales();break;
             case 3: salesCurrentMonth();break;
+            case 4: salesSinceDayOne();break;
             default:System.out.println("Thank you for visiting!");break;
         }
     }
@@ -218,11 +220,11 @@ public class BookStore {
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
         ) {
-            String refquery = "REFRESH MATERIALIZED VIEW SalesByMonth";
+            String refquery = "REFRESH MATERIALIZED VIEW SalesVsExpThisMonth";
             PreparedStatement qry = connection.prepareStatement(refquery);
             qry.execute();
             qry.close();
-            String query ="select * from SalesByMonth";
+            String query ="select * from SalesVsExpThisMonth";
             ResultSet crt = statement.executeQuery(query);
             if(!crt.next()){
                 System.out.println("No Reports Available");
@@ -231,10 +233,13 @@ public class BookStore {
             System.out.println("============================================= T H I S   M O N T H S   S A L E S =============================================");
             do{
                 System.out.println("============================================================================================================");
-                System.out.println("ISBN                : "+crt.getString("isbn"));
-                System.out.println("Book name           : "+crt.getString("book_name"));
-                System.out.println("Copies Sold         : "+crt.getString("copies_sold"));
-                System.out.println("Sales               : "+crt.getString("sales"));
+                System.out.println("ISBN                      : "+crt.getString("isbn"));
+                System.out.println("Percent to Publisher      : "+crt.getString("percent_to_publisher"));
+                System.out.println("Book name                 : "+crt.getString("book_name"));
+                System.out.println("Copies Sold               : "+crt.getString("copies_sold"));
+                System.out.println("Sales                     : "+crt.getString("sales"));
+                System.out.println("Publishers Cut            : "+crt.getString("publisherscut"));
+                System.out.println("Profit                     : "+crt.getString("profit"));
                 System.out.println("============================================================================================================\n");
             }while(crt.next());
             crt.close();
@@ -242,6 +247,40 @@ public class BookStore {
             System.out.println("Exception 1: " + sqle);
         }
 
+    }
+
+    private void salesSinceDayOne() {
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
+            String refquery = "REFRESH MATERIALIZED VIEW SalesVsExpAllMonth";
+            PreparedStatement qry = connection.prepareStatement(refquery);
+            qry.execute();
+            qry.close();
+            String query ="select * from SalesVsExpAllMonth";
+            ResultSet crt = statement.executeQuery(query);
+            if(!crt.next()){
+                System.out.println("No Reports Available");
+                return;
+            }
+            System.out.println("============================================= Y E A R L Y   S A L E S =============================================");
+            do{
+                System.out.println("============================================================================================================");
+                System.out.println("Date                      : "+crt.getString("date"));
+                System.out.println("ISBN                      : "+crt.getString("isbn"));
+                System.out.println("Percent to Publisher      : "+crt.getString("percent_to_publisher"));
+                System.out.println("Book name                 : "+crt.getString("book_name"));
+                System.out.println("Copies Sold               : "+crt.getString("copies_sold"));
+                System.out.println("Sales                     : "+crt.getString("sales"));
+                System.out.println("Publishers Cut            : "+crt.getString("publisherscut"));
+                System.out.println("Profit                     : "+crt.getString("profit"));
+                System.out.println("============================================================================================================\n");
+            }while(crt.next());
+            crt.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
     }
 
     private void genreSales() {
@@ -299,6 +338,7 @@ public class BookStore {
             System.out.println("Exception search: " + sqle);
         }
     }
+
 
     //SearchTool
     public static void searchBook(){

@@ -44,7 +44,7 @@ public class ShoppingCart {
                     ) {
                         ResultSet aSet = statement.executeQuery("select * from public.book where public.book.isbn = '"+isbn+"' and public.book.quantity >= "+ quantity);
                         if(aSet == null){
-                            System.out.println("Quantity is too much");
+                            System.out.println("Quantity is too much/ Would not be available in stock");
                         }
                         else{
                             int item_id = cartSize + 1;

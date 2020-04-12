@@ -70,7 +70,7 @@ CREATE TABLE public.book
     unit_price numeric(6,2) not null,
     date_of_publish date not null check (date_of_publish < now()),
 	percent_to_publisher numeric(4,3) not null check (percent_to_publisher < 1) ,
-	requested_quantity varchar(10) not null,
+	requested_quantity integer not null,
 	last_request_date date not null,
 	request_approved boolean,
 	publisher_id varchar(10),

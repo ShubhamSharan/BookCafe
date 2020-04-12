@@ -35,7 +35,8 @@ public class menus {
         System.out.println("\uD83D\uDCD9 View all users press 4");
         System.out.println("\uD83D\uDC4D Track shipments press 5");
         System.out.println("\uD83D\uDC4D To show reports press 6");
-        System.out.println("\uD83D\uDC4D Exit mode press 7");
+        System.out.println("\uD83D\uDC4D View all publishers 7");
+        System.out.println("\uD83D\uDC4D Exit mode press 8");
     }
     public static void ExPublisherView(){
         System.out.println("\u001b[34m------------- Menu -------------");
@@ -51,6 +52,7 @@ public class menus {
         System.out.println("\uD83D\uDCD6 Copies sold by genre 1 ");
         System.out.println("\uD83D\uDCD6 Copies sold by author 2");
         System.out.println("\uD83D\uDCD6 Sales by Current Month 3");
+        System.out.println("\uD83D\uDCD6 Sales by Since First Sale 4");
         System.out.println("\uD83D\uDCD6 Exit Any other number to exit");
     }
 
