@@ -147,6 +147,41 @@ public class Publisher {
                 Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
                 Statement statement = connection.createStatement()
         ) {
+            String refquery = "REFRESH MATERIALIZED VIEW SalesVsExpThisMonth";
+            PreparedStatement qry = connection.prepareStatement(refquery);
+            qry.execute();
+            qry.close();
+            String query ="select * from SalesVsExpThisMonth where publisher_id = '"+this.publisher_id+"'";
+            ResultSet crt = statement.executeQuery(query);
+            if(!crt.next()){
+                System.out.println("No Reports Available");
+                return;
+            }
+            System.out.println("============================================= T H I S   M O N T H S   S A L E S =============================================");
+            float amt = 0;
+            do{
+                System.out.println("ISBN                      : "+crt.getString("isbn"));
+                System.out.println("Percent to Publisher      : "+crt.getString("percent_to_publisher"));
+                System.out.println("Book name                 : "+crt.getString("book_name"));
+                System.out.println("Copies Sold               : "+crt.getString("copies_sold"));
+                System.out.println("Sales                     : "+crt.getString("sales"));
+                System.out.println("Publishers Cut            : "+crt.getString("publisherscut"));
+                System.out.println("Profit                     : "+crt.getString("profit"));
+                System.out.println("-------------------------------------------------------------------------------------------------------------\n");
+                amt = amt + crt.getFloat("publisherscut");
+            }while(crt.next());
+            System.out.println("This Month's Transfer = $: "+amt);
+            crt.close();
+            connection.close();
+            statement.close();
+        } catch (Exception sqle) {
+            System.out.println("Exception 1: " + sqle);
+        }
+
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/BookCafe?currentSchema=public","shubhamsharan09","yvan2002");
+                Statement statement = connection.createStatement()
+        ) {
             String refquery = "REFRESH MATERIALIZED VIEW SalesVsExpAllMonth";
             PreparedStatement qry = connection.prepareStatement(refquery);
             qry.execute();
@@ -157,7 +192,7 @@ public class Publisher {
                 System.out.println("No Reports Available");
                 return;
             }
-            System.out.println("============================================= Y E A R L Y   S A L E S =============================================");
+            System.out.println("============================================= A L L   S A L E S =============================================");
             float amt = 0;
             do{
                 System.out.println("Date                      : "+crt.getString("date"));
@@ -171,7 +206,7 @@ public class Publisher {
                 System.out.println("-------------------------------------------------------------------------------------------------------------\n");
                 amt = amt + crt.getFloat("publisherscut");
             }while(crt.next());
-            System.out.println("This Month's Transfer = $: "+amt);
+            System.out.println("All Time Funds Transfer = $: "+amt);
             crt.close();
         } catch (Exception sqle) {
             System.out.println("Exception 1: " + sqle);

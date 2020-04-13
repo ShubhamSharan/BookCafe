@@ -20,12 +20,12 @@ CREATE MATERIALIZED VIEW CopiesSoldByAuthor AS
 		GROUP BY public.author.author_id, public.author.author_name;
 REFRESH MATERIALIZED VIEW CopiesSoldByGenre;
 SELECT * FROM CopiesSoldByAuthor
-
 drop materialized view SalesVsExpThisMonth;
 CREATE MATERIALIZED VIEW SalesVsExpThisMonth AS
 SELECT
 	public.shipment_confirmed.isbn,
 	public.book.book_name,
+	public.book.publisher_id,
 	public.book.percent_to_publisher,
 	sum(item_quantity) as Copies_Sold,
 	sum(item_quantity * unit_price)::numeric(20,2) as sales,
@@ -45,6 +45,7 @@ CREATE MATERIALIZED VIEW SalesVsExpAllMonth AS
 SELECT
 	public.shipment_confirmed.isbn,
 	public.book.book_name,
+	public.book.publisher_id,
 	to_char(public.shopping_cart.shipment_placement_date, 'YYYY-MM') as date,
 	public.book.percent_to_publisher,
 	sum(item_quantity) as Copies_Sold,
@@ -57,4 +58,3 @@ SELECT
 	date;
 
 REFRESH MATERIALIZED VIEW SalesVsExpAllMonth;
-SELECT * FROM SalesVsExpAllMonth;
