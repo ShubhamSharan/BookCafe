@@ -1,5 +1,5 @@
 DROP FUNCTION IF EXISTS SearchByAtomic(val varchar(400), col_nam varchar(400));
-
+-- this is a fantastic piece of sql code which allows me to search books based on any parameter
 CREATE FUNCTION SearchByAtomic(val varchar(400), col_nam varchar(400))
 	RETURNS TABLE(
 		isbn varchar(10),
@@ -23,10 +23,10 @@ CREATE FUNCTION SearchByAtomic(val varchar(400), col_nam varchar(400))
 			group by book.isbn,public.publisher.publisher_id',col_nam,val);
 		END;
 $$ LANGUAGE plpgsql;
-
+-- This is using dynamicSQL to parse the statements
 select * from SearchByAtomic('a','book.isbn');
 
-
+-- see your shoppingcarts
 CREATE OR REPLACE FUNCTION ShoppingCartsList(user_id varchar(10))
 	RETURNS TABLE(
 		order_id varchar(10),
@@ -49,7 +49,7 @@ CREATE OR REPLACE FUNCTION ShoppingCartsList(user_id varchar(10))
 			;
 		END;
 $$ LANGUAGE plpgsql;
-
+-- see your shipments
 CREATE OR REPLACE FUNCTION Shipment(user_id varchar(10))
 	RETURNS TABLE(
 		orderId varchar(10),
@@ -75,8 +75,8 @@ CREATE OR REPLACE FUNCTION Shipment(user_id varchar(10))
 		END;
 $$ LANGUAGE plpgsql;
 
+-- gets user details that can be viewed by admin or user when checking profile
 DROP FUNCTION IF EXISTS UserDets(userid varchar(10));
-
 CREATE OR REPLACE FUNCTION userDets(userid varchar(10))
 	RETURNS TABLE(
 		user_id varchar(10),
@@ -103,6 +103,7 @@ CREATE OR REPLACE FUNCTION userDets(userid varchar(10))
 $$ LANGUAGE plpgsql;
 select * from userDets('')
 
+-- gets publisher details that can be viewed by admin or publisher when checking profile
 CREATE OR REPLACE FUNCTION pubDets(idval varchar(10))
 	RETURNS TABLE(
 		publisher_id varchar(10),

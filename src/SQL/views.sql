@@ -1,3 +1,4 @@
+--This is the view that is created to get sales by genre
 drop materialized view CopiesSoldByGenre;
 CREATE MATERIALIZED VIEW CopiesSoldByGenre AS
 	SELECT
@@ -6,10 +7,10 @@ CREATE MATERIALIZED VIEW CopiesSoldByGenre AS
 		sum(unit_price * item_quantity)::numeric(15,2) as sales
 		FROM (public.shipment_confirmed inner join public.genre on public.shipment_confirmed.isbn = public.genre.isbn) inner join public.book on public.shipment_confirmed.isbn = public.book.isbn
 		GROUP BY public.genre.genre;
-
+--refresh before showcasing the view
 REFRESH MATERIALIZED VIEW CopiesSoldByGenre;
 SELECT * FROM CopiesSoldByGenre;
-
+--This view is created to get view for sales by author
 DROP materialized view CopiesSoldByAuthor;
 CREATE MATERIALIZED VIEW CopiesSoldByAuthor AS
 	SELECT
@@ -18,8 +19,11 @@ CREATE MATERIALIZED VIEW CopiesSoldByAuthor AS
 		sum(unit_price * item_quantity)::numeric(15,2) as sales
 		FROM (public.shipment_confirmed inner join public.author on public.shipment_confirmed.isbn = public.author.isbn) inner join public.book on public.shipment_confirmed.isbn = public.book.isbn
 		GROUP BY public.author.author_id, public.author.author_name;
+		--refresh before showcasing the view
 REFRESH MATERIALIZED VIEW CopiesSoldByGenre;
 SELECT * FROM CopiesSoldByAuthor
+
+--Sales by this month only
 drop materialized view SalesVsExpThisMonth;
 CREATE MATERIALIZED VIEW SalesVsExpThisMonth AS
 SELECT
@@ -40,6 +44,7 @@ SELECT
 REFRESH MATERIALIZED VIEW SalesVsExpThisMonth;
 SELECT * FROM SalesVsExpThisMonth;
 
+--Sales since day one
 drop materialized view SalesVsExpAllMonth;
 CREATE MATERIALIZED VIEW SalesVsExpAllMonth AS
 SELECT
@@ -56,5 +61,5 @@ SELECT
 	GROUP BY public.shipment_confirmed.isbn,public.shopping_cart.shipment_placement_date,public.book.isbn
 	ORDER BY
 	date;
-
+--refresh before as always to ensure up to date
 REFRESH MATERIALIZED VIEW SalesVsExpAllMonth;

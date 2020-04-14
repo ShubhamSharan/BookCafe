@@ -1,3 +1,4 @@
+--drop everything before recreation
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
@@ -7,6 +8,7 @@ CREATE TYPE bankaccounttype AS (
     expirydate   date
 );
 
+-- Custom composite data types are used to reduce repetition of code
 CREATE TYPE addresstype AS
 (
     address_name varchar(255),
@@ -24,15 +26,16 @@ CREATE TYPE nametype AS (
 CREATE TABLE public.user
 (
     user_id varchar(10) not null,
-	user_type boolean not null, --is publisher
+	user_type boolean not null, --is admin or user
     name nametype,
     email varchar(255) not null check (email like '%@%'),
     password varchar(255) not null,
 	address addresstype not null,
     bank_account bankaccounttype not null check((bank_account).expirydate > now()),
     primary key (user_id)
-);
+); --if expired bank account added don't accept
 
+--mutli value table
 CREATE TABLE public.user_phone
 (
 	user_id varchar(10) not null,
@@ -41,6 +44,7 @@ CREATE TABLE public.user_phone
 	foreign key (user_id) references public.user on delete cascade
 );
 
+--Both user and publisher use custom sql data types
 CREATE TABLE public.publisher
 (
     publisher_id varchar(10) not null,
@@ -52,6 +56,7 @@ CREATE TABLE public.publisher
     primary key (publisher_id)
 );
 
+--mutli value table
 CREATE TABLE public.pub_phone
 (
 	publisher_id varchar(10) not null,
@@ -59,8 +64,7 @@ CREATE TABLE public.pub_phone
 	primary key (publisher_id,phonenumber),
 	foreign key (publisher_id) references public.publisher on delete cascade
 );
---Admin
-
+--Book item
 CREATE TABLE public.book
 (
     isbn varchar(10) not null,
@@ -78,7 +82,7 @@ CREATE TABLE public.book
 	foreign key (publisher_id) references public.publisher
 );
 
-
+--serial autogenerates the author id for me
 CREATE TABLE public.author
 (
 	author_id serial unique not null,
@@ -88,7 +92,7 @@ CREATE TABLE public.author
 	foreign key (isbn) references public.book on delete cascade
 );
 
-
+--mutli value table
 CREATE TABLE public.genre
 (
 	isbn varchar(10) not null,
@@ -97,7 +101,7 @@ CREATE TABLE public.genre
 	foreign key (isbn) references public.book on delete cascade
 );
 
-
+--A shopping cart only exists if the user exists
 CREATE TABLE public.shopping_cart
 (
     order_id varchar(10) not null,

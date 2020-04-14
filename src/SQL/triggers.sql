@@ -8,7 +8,7 @@ BEGIN
 END;
 $$
 LANGUAGE 'plpgsql';
-
+--after shipment is added the shipment_placement_date is set
 DROP TRIGGER IF EXISTS shipment_update ON public.shipment_confirmed;
 CREATE TRIGGER shipment_update after insert
 on shipment_confirmed
@@ -27,13 +27,14 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
+--before confirmed the books are subtracted and secured for that specific user. Its like they are in his hand and no one else can buy it but he himself hasn't commited 100%
 DROP TRIGGER IF EXISTS quantity_update ON public.shipment_confirmed;
 CREATE TRIGGER quantity_update before insert
 on shipment_confirmed
 FOR EACH ROW
 EXECUTE PROCEDURE checkQuantity();
 
---bellow threshold emails
+-- determines last months sales to get the quantity for reorder
 CREATE OR REPLACE FUNCTION LastMonthSales(isbn_in varchar(10))
 RETURNS INTEGER AS $$
 BEGIN
@@ -51,7 +52,7 @@ $$
 LANGUAGE 'plpgsql';
 
 Select * from LastMonthSales('997105933B');
-
+-- this is crucial as it gets triggered when the quantity dips bellow threshold before insertion, why before cause we already validate stock prior while adding to cart.
 CREATE OR REPLACE FUNCTION pubReq()
 RETURNS trigger AS $$
 BEGIN
@@ -65,6 +66,7 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
+--trigger creation
 DROP TRIGGER IF EXISTS publisher_request_update on shipment_confirmed;
 CREATE TRIGGER publisher_request_update before insert
 on shipment_confirmed
